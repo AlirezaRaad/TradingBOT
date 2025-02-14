@@ -120,12 +120,12 @@ class TradingBot:
         applyWhere: Literal[
             "Close",
             "Open",
-            "High Price",
-            "Low Price",
-            "Median Price",
-            "Typical Price",
-            "Weighted Close",
-        ] = "Median Price",
+            "High",
+            "Low",
+            "Median",
+            "Typical",
+            "Weighted",
+        ] = "Median ",
     ):
         """
         shorterMA : Shorter-term MA
@@ -175,7 +175,8 @@ class TradingBot:
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"
 
 
-class MovingAverage(TradingBot):
+# class MovingAverage(TradingBot):
+class MovingAverage:
     """
     This class provides methods to calculate different types of Moving Averages.
 
@@ -235,15 +236,6 @@ class MovingAverage(TradingBot):
         self.shortTf = shortTf
         self.longTf = longTf
         self.applyWhere = applyWhere
-        self.WhereToApply = {
-            "close",
-            "open",
-            "high price",
-            "low price",
-            "median price",
-            "typical price",
-            "weighted close",
-        }
 
         self.timeframes = {
             "1 minute": mt5.TIMEFRAME_M1,
@@ -268,6 +260,16 @@ class MovingAverage(TradingBot):
             "1 week": mt5.TIMEFRAME_W1,
             "1 month": mt5.TIMEFRAME_MN1,
         }
+        self.WhereToApply = {
+            "close",
+            "open",
+            "high",
+            "low",
+            "median",
+            "typical",
+            "weighted",
+        }
+        self.data = self.GetData()
 
     def GetData(self):
         dfShort = pd.DataFrame(
@@ -275,6 +277,7 @@ class MovingAverage(TradingBot):
                 self.symbol, self.timeframes[self.shortTf], 0, self.long
             )
         ).add_prefix("S_")
+        dfShort["S_time"] = pd.to_datetime(dfShort["S_time"], unit="s")
         dfShort.index = dfShort["S_time"]
         dfShort.drop(columns=["S_time", "S_real_volume"], inplace=True)
 
@@ -283,14 +286,13 @@ class MovingAverage(TradingBot):
                 self.symbol, self.timeframes[self.longTf], 0, self.long
             )
         ).add_prefix("L_")
+        dfLong["L_time"] = pd.to_datetime(dfLong["L_time"], unit="s")
         dfLong.index = dfLong["L_time"]
         dfLong.drop(columns=["L_time", "L_real_volume"], inplace=True)
         if dfShort.empty or dfLong.empty:
             return ValueError("One or both DataFrames are empty!")
 
-        kh = pd.DataFrame(pd.concat([dfShort, dfLong], axis=1))
-
-        return kh
+        return pd.DataFrame(pd.concat([dfShort, dfLong], axis=1))
 
     def SMA(self):
         """
@@ -307,10 +309,32 @@ class MovingAverage(TradingBot):
         if self.applyWhere.lower() in self.WhereToApply:
             print(self.applyWhere.lower())
 
-        df = self.GetData()
+        # df = self.GetData()
 
-    def CalculateSMA(self):
-        pass
+    def Calculate(self):
+        """
+        This Method Calculates the Corresponding Moving Average Based On MovingAverage.applyWhere
+        """
+        if self.applyWhere == "median":
+            self.data["S_median_MA"] = (self.data.S_high + self.data.S_low) / 2
+
+            self.data["L_median_MA"] = (self.data.L_high + self.data.L_low) / 2
+        elif self.applyWhere == "typical":
+            self.data["S_typical_MA"] = (
+                self.data.S_high + self.data.S_low + self.data.S_close
+            ) / 3
+
+            self.data["L_typical_MA"] = (
+                self.data.L_high + self.data.L_low + self.data.L_close
+            ) / 3
+        elif self.applyWhere == "weighted":
+            self.data["S_typical_MA"] = (
+                self.data.S_high + self.data.S_low + 2 * self.data.S_close
+            ) / 4
+
+            self.data["L_typical_MA"] = (
+                self.data.L_high + self.data.L_low + 2 * self.data.L_close
+            ) / 4
 
     def EMA(self):
         """
