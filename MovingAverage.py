@@ -100,17 +100,18 @@ class MovingAverage:
             "typical",
             "weighted",
         }
-        self.data = self.GetData()
+        self.shorter_data, self.longer_data = self.GetData()
 
     def GetData(self):
         dfShort = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self.symbol, self.timeframes[self.shortTf], 0, self.long
+                self.symbol, self.timeframes[self.shortTf], 0, self.short
             )
         ).add_prefix("S_")
         dfShort["S_time"] = pd.to_datetime(dfShort["S_time"], unit="s")
         dfShort.index = dfShort["S_time"]
         dfShort.drop(columns=["S_time", "S_real_volume"], inplace=True)
+        dfShort.index.rename("time", inplace=True)
 
         dfLong = pd.DataFrame(
             mt5.copy_rates_from_pos(
@@ -120,10 +121,49 @@ class MovingAverage:
         dfLong["L_time"] = pd.to_datetime(dfLong["L_time"], unit="s")
         dfLong.index = dfLong["L_time"]
         dfLong.drop(columns=["L_time", "L_real_volume"], inplace=True)
+        dfLong.index.rename("time", inplace=True)
+
         if dfShort.empty or dfLong.empty:
             return ValueError("One or both DataFrames are empty!")
 
-        return pd.DataFrame(pd.concat([dfShort, dfLong], axis=1))
+        return dfShort, dfLong
+
+    def Calculate(self):
+        """
+        This Method Calculates the Corresponding Moving Average Based On MovingAverage.applyWhere
+        """
+        if self.applyWhere == "median":
+            self.shorter_data["S_median_MA"] = (
+                self.shorter_data.S_high + self.shorter_data.S_low
+            ) / 2
+
+            self.longer_data["L_median_MA"] = (
+                self.longer_data.L_high + self.longer_data.L_low
+            ) / 2
+
+        elif self.applyWhere == "typical":
+            self.shorter_data["S_typical_MA"] = (
+                self.shorter_data.S_high + self.shorter_data.S_low + self.data.S_close
+            ) / 3
+
+            self.longer_data["L_typical_MA"] = (
+                self.longer_data.L_high
+                + self.longer_data.L_low
+                + self.longer_data.L_close
+            ) / 3
+
+        elif self.applyWhere == "weighted":
+            self.shorter_data["S_weighted_MA"] = (
+                self.shorter_data.S_high
+                + self.shorter_data.S_low
+                + 2 * self.shorter_data.S_close
+            ) / 4
+
+            self.data["L_weighted_MA"] = (
+                self.longer_data.L_high
+                + self.longer_data.L_low
+                + 2 * self.longer_data.L_close
+            ) / 4
 
     def SMA(self):
         """
@@ -141,31 +181,6 @@ class MovingAverage:
             print(self.applyWhere.lower())
 
         # df = self.GetData()
-
-    def Calculate(self):
-        """
-        This Method Calculates the Corresponding Moving Average Based On MovingAverage.applyWhere
-        """
-        if self.applyWhere == "median":
-            self.data["S_median_MA"] = (self.data.S_high + self.data.S_low) / 2
-
-            self.data["L_median_MA"] = (self.data.L_high + self.data.L_low) / 2
-        elif self.applyWhere == "typical":
-            self.data["S_typical_MA"] = (
-                self.data.S_high + self.data.S_low + self.data.S_close
-            ) / 3
-
-            self.data["L_typical_MA"] = (
-                self.data.L_high + self.data.L_low + self.data.L_close
-            ) / 3
-        elif self.applyWhere == "weighted":
-            self.data["S_weighted_MA"] = (
-                self.data.S_high + self.data.S_low + 2 * self.data.S_close
-            ) / 4
-
-            self.data["L_weighted_MA"] = (
-                self.data.L_high + self.data.L_low + 2 * self.data.L_close
-            ) / 4
 
     def EMA(self):
         """
