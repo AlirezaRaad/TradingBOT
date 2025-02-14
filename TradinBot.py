@@ -328,11 +328,11 @@ class MovingAverage:
                 self.data.L_high + self.data.L_low + self.data.L_close
             ) / 3
         elif self.applyWhere == "weighted":
-            self.data["S_typical_MA"] = (
+            self.data["S_weighted_MA"] = (
                 self.data.S_high + self.data.S_low + 2 * self.data.S_close
             ) / 4
 
-            self.data["L_typical_MA"] = (
+            self.data["L_weighted_MA"] = (
                 self.data.L_high + self.data.L_low + 2 * self.data.L_close
             ) / 4
 
