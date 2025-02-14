@@ -100,7 +100,7 @@ class MovingAverage:
             "typical",
             "weighted",
         }
-        self.shorter_data, self.longer_data = self.GetData()
+        self.GetData()
 
     def GetData(self):
         dfShort = pd.DataFrame(
@@ -126,7 +126,7 @@ class MovingAverage:
         if dfShort.empty or dfLong.empty:
             return ValueError("One or both DataFrames are empty!")
 
-        return dfShort, dfLong
+        self.shorter_data, self.longer_data = dfShort, dfLong
 
     def Calculate(self):
         """
@@ -143,7 +143,9 @@ class MovingAverage:
 
         elif self.applyWhere == "typical":
             self.shorter_data["S_typical_MA"] = (
-                self.shorter_data.S_high + self.shorter_data.S_low + self.data.S_close
+                self.shorter_data.S_high
+                + self.shorter_data.S_low
+                + self.shorter_data.S_close
             ) / 3
 
             self.longer_data["L_typical_MA"] = (
@@ -159,7 +161,7 @@ class MovingAverage:
                 + 2 * self.shorter_data.S_close
             ) / 4
 
-            self.data["L_weighted_MA"] = (
+            self.longer_data["L_weighted_MA"] = (
                 self.longer_data.L_high
                 + self.longer_data.L_low
                 + 2 * self.longer_data.L_close
@@ -177,10 +179,11 @@ class MovingAverage:
         - Pn = Price at period n
         - N  = Number of periods
         """
-        if self.applyWhere.lower() in self.WhereToApply:
-            print(self.applyWhere.lower())
+        if self.applyWhere.lower() not in self.WhereToApply:
+            raise ValueError("Enter Correct price input to calculate SMA. ")
 
-        # df = self.GetData()
+        self.longerMA = self.longer_data[f"L_{self.applyWhere}_MA"].mean()
+        self.shorterMA = self.shorter_data[f"S_{self.applyWhere}_MA"].mean()
 
     def EMA(self):
         """
@@ -196,7 +199,8 @@ class MovingAverage:
         - N  = Number of periods
         - EMA_{t-1} = Previous EMA value
         """
-        pass
+        if self.applyWhere.lower() not in self.WhereToApply:
+            raise ValueError("Enter Correct price input to calculate EMA.")
 
     def SMMA(self):
         """
