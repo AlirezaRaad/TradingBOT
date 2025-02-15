@@ -61,7 +61,7 @@ class MovingAverage:
 
     def __init__(self, kind, symbol, short, long, shortTf, longTf, applyWhere):
         self.kind = kind
-        self.symbol = symbol
+        self._sym_bol_ = symbol
         self.short = short
         self.long = long
         self.shortTf = shortTf
@@ -102,10 +102,14 @@ class MovingAverage:
         }
         self.GetData()
 
+    @property
+    def symbol(self):
+        return self._sym_bol_
+
     def GetData(self):
         dfShort = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self.symbol, self.timeframes[self.shortTf], 0, self.short
+                self._sym_bol_, self.timeframes[self.shortTf], 0, self.short
             )
         ).add_prefix("S_")
         dfShort["S_time"] = pd.to_datetime(dfShort["S_time"], unit="s")
@@ -115,7 +119,7 @@ class MovingAverage:
 
         dfLong = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self.symbol, self.timeframes[self.longTf], 0, self.long
+                self._sym_bol_, self.timeframes[self.longTf], 0, self.long
             )
         ).add_prefix("L_")
         dfLong["L_time"] = pd.to_datetime(dfLong["L_time"], unit="s")
@@ -201,6 +205,9 @@ class MovingAverage:
         """
         if self.applyWhere.lower() not in self.WhereToApply:
             raise ValueError("Enter Correct price input to calculate EMA.")
+
+        smoothing_factor = 2 / (self.short + 1)
+        # initial_ema =
 
     def SMMA(self):
         """
