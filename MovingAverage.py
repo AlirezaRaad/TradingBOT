@@ -265,6 +265,9 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
+            if self.applyWhere.lower() not in self.WhereToApply:
+                raise ValueError("Enter Correct price input to calculate EMA.")
+
             # Calculate WMA for the shorter Data
             tmp_short = dict()
             counter = self.short
