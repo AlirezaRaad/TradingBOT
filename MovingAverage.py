@@ -303,3 +303,6 @@ class MovingAverage:
         except Exception as e:
             print(e)
             return False
+
+    def VWMA(self) -> bool:
+        pass
