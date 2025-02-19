@@ -59,16 +59,25 @@ class MovingAverage:
 
     """
 
-    def __init__(self, kind, symbol, short, long, shortTf, longTf, applyWhere):
+    def __init__(self, kind, symbol, period, timeframe, calc_meth):
         self.kind = kind
+        self.period = period
         self._sym_bol_ = symbol
-        self.short = short
-        self.long = long
-        self.shortTf = shortTf
-        self.longTf = longTf
-        self.applyWhere = applyWhere
+        self.timeframe = timeframe
 
-        self.timeframes = {
+        if calc_meth not in self.whereToApply:
+            raise TypeError(
+                "calc_meth should be in self.whereToApply. See self.whereToApply."
+            )
+        self.calc_meth = calc_meth
+
+    @property
+    def symbol(self):
+        return self._sym_bol_
+
+    @property
+    def alltimeframes(self):
+        return {
             "1 minute": mt5.TIMEFRAME_M1,
             "2 minutes": mt5.TIMEFRAME_M2,
             "3 minutes": mt5.TIMEFRAME_M3,
@@ -91,7 +100,10 @@ class MovingAverage:
             "1 week": mt5.TIMEFRAME_W1,
             "1 month": mt5.TIMEFRAME_MN1,
         }
-        self.WhereToApply = {
+
+    @property
+    def whereToApply(self):
+        return {
             "close",
             "open",
             "high",
@@ -100,77 +112,52 @@ class MovingAverage:
             "typical",
             "weighted",
         }
-        self.GetData()
-
-    @property
-    def symbol(self):
-        return self._sym_bol_
 
     def GetData(self):
-        dfShort = pd.DataFrame(
+        df = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self._sym_bol_, self.timeframes[self.shortTf], 0, self.short
+                self._sym_bol_, self.alltimeframes[self.timeframe], 0, self.period
             )
-        ).add_prefix("S_")
-        dfShort["S_time"] = pd.to_datetime(dfShort["S_time"], unit="s")
-        dfShort.index = dfShort["S_time"]
-        dfShort.drop(columns=["S_time", "S_real_volume"], inplace=True)
-        dfShort.index.rename("time", inplace=True)
+        )
+        df["time"] = pd.to_datetime(df["time"], unit="s")
+        df.index = df["time"]
+        df.drop(columns=["time", "real_volume"], inplace=True)
+        df.index.rename("time", inplace=True)
 
-        dfLong = pd.DataFrame(
-            mt5.copy_rates_from_pos(
-                self._sym_bol_, self.timeframes[self.longTf], 0, self.long
-            )
-        ).add_prefix("L_")
-        dfLong["L_time"] = pd.to_datetime(dfLong["L_time"], unit="s")
-        dfLong.index = dfLong["L_time"]
-        dfLong.drop(columns=["L_time", "L_real_volume"], inplace=True)
-        dfLong.index.rename("time", inplace=True)
+        if df.empty:
+            return ValueError("DataFrames are empty!")
 
-        if dfShort.empty or dfLong.empty:
-            return ValueError("One or both DataFrames are empty!")
-
-        self.shorter_data, self.longer_data = dfShort, dfLong
+        self.data = df
 
     def Calculate(self):
         """
         This Method Calculates the Corresponding Moving Average Based On MovingAverage.applyWhere
         """
+        self.GetData()
 
-        if self.applyWhere == "median":
-            self.shorter_data["S_median_MA"] = (
-                self.shorter_data.S_high + self.shorter_data.S_low
-            ) / 2
+        if self.calc_meth in ["close", "open", "high", "low"]:
+            self.data["MA_Calc_Price"] = self.data[self.calc_meth]
+            return True
 
-            self.longer_data["L_median_MA"] = (
-                self.longer_data.L_high + self.longer_data.L_low
-            ) / 2
+        elif self.calc_meth == "median":
 
-        elif self.applyWhere == "typical":
-            self.shorter_data["S_typical_MA"] = (
-                self.shorter_data.S_high
-                + self.shorter_data.S_low
-                + self.shorter_data.S_close
+            self.data["MA_Calc_Price"] = (self.data.high + self.data.low) / 2
+            return True
+
+        elif self.calc_meth == "typical":
+
+            self.data["MA_Calc_Price"] = (
+                self.data.high + self.data.low + self.data.close
             ) / 3
+            return True
 
-            self.longer_data["L_typical_MA"] = (
-                self.longer_data.L_high
-                + self.longer_data.L_low
-                + self.longer_data.L_close
-            ) / 3
-
-        elif self.applyWhere == "weighted":
-            self.shorter_data["S_weighted_MA"] = (
-                self.shorter_data.S_high
-                + self.shorter_data.S_low
-                + 2 * self.shorter_data.S_close
+        elif self.calc_meth == "weighted":
+            self.data["MA_Calc_Price"] = (
+                self.data.high + self.data.low + 2 * self.data.close
             ) / 4
-
-            self.longer_data["L_weighted_MA"] = (
-                self.longer_data.L_high
-                + self.longer_data.L_low
-                + 2 * self.longer_data.L_close
-            ) / 4
+            return True
+        else:
+            return False
 
     def SMA(self) -> bool:
         """
@@ -185,7 +172,7 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
-            if self.applyWhere.lower() not in self.WhereToApply:
+            if self.whereToApply.lower() not in self.WhereToApply:
                 raise ValueError("Enter Correct price input to calculate SMA. ")
 
             self.longerMA = self.longer_data[f"L_{self.applyWhere}_MA"].mean()
