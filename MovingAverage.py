@@ -171,9 +171,9 @@ class MovingAverage:
                 + 2 * self.longer_data.L_close
             ) / 4
 
-    def SMA(self):
+    def SMA(self) -> bool:
         """
-        SMA(prices: list, period: int) -> float
+        SMA(prices: list, period: int) -> bool
         Calculates the Simple Moving Average (SMA).
 
         Formula:
@@ -183,15 +183,20 @@ class MovingAverage:
         - Pn = Price at period n
         - N  = Number of periods
         """
-        if self.applyWhere.lower() not in self.WhereToApply:
-            raise ValueError("Enter Correct price input to calculate SMA. ")
+        try:
+            if self.applyWhere.lower() not in self.WhereToApply:
+                raise ValueError("Enter Correct price input to calculate SMA. ")
 
-        self.longerMA = self.longer_data[f"L_{self.applyWhere}_MA"].mean()
-        self.shorterMA = self.shorter_data[f"S_{self.applyWhere}_MA"].mean()
+            self.longerMA = self.longer_data[f"L_{self.applyWhere}_MA"].mean()
+            self.shorterMA = self.shorter_data[f"S_{self.applyWhere}_MA"].mean()
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
-    def EMA(self):
+    def EMA(self) -> bool:
         """
-        EMA(prices: list, period: int) -> float
+        EMA(prices: list, period: int) -> bool
         Calculates the Exponential Moving Average (EMA).
 
         Formula:
@@ -203,29 +208,34 @@ class MovingAverage:
         - N  = Number of periods
         - EMA_{t-1} = Previous EMA value
         """
-        if self.applyWhere.lower() not in self.WhereToApply:
-            raise ValueError("Enter Correct price input to calculate EMA.")
+        try:
+            if self.applyWhere.lower() not in self.WhereToApply:
+                raise ValueError("Enter Correct price input to calculate EMA.")
 
-        self.SMA()
-        # EMA is kind of a Recursive FUnction So I have To make a recursive Function in order to calculate the EMA.
-        # OR We can use pandas.dataFrame.ewm method to easily do the job.
+            self.SMA()
+            # EMA is kind of a Recursive FUnction So I have To make a recursive Function in order to calculate the EMA.
+            # OR We can use pandas.dataFrame.ewm method to easily do the job.
 
-        self.shorterEMA = (
-            self.shorter_data[f"S_{self.applyWhere}_MA"]
-            .ewm(span=self.short, adjust=False)
-            .mean()
-            .iloc[-1]
-        )
-        self.longerEMA = (
-            self.shorter_data[f"S_{self.applyWhere}_MA"]
-            .ewm(span=self.long, adjust=False)
-            .mean()
-            .iloc[-1]
-        )
+            self.shorterEMA = (
+                self.shorter_data[f"S_{self.applyWhere}_MA"]
+                .ewm(span=self.short, adjust=False)
+                .mean()
+                .iloc[-1]
+            )
+            self.longerEMA = (
+                self.shorter_data[f"S_{self.applyWhere}_MA"]
+                .ewm(span=self.long, adjust=False)
+                .mean()
+                .iloc[-1]
+            )
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
-    def SMMA(self):
+    def SMMA(self) -> bool:
         """
-        SMMA(prices: list, period: int) -> float
+        SMMA(prices: list, period: int) -> bool
         Calculates the Smoothed Moving Average (SMMA).
 
         Formula:
@@ -238,9 +248,9 @@ class MovingAverage:
         """
         pass
 
-    def WMA(self):
+    def WMA(self) -> bool:
         """
-        WMA(prices: list, period: int) -> float
+        WMA(prices: list, period: int) -> bool
         Calculates the Weighted Moving Average (WMA).
 
         Formula:
