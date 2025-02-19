@@ -136,23 +136,23 @@ class MovingAverage:
         self.GetData()
 
         if self.calc_meth in ["close", "open", "high", "low"]:
-            self.data["for_MA_Calc_Price"] = self.data[self.calc_meth]
+            self.data["Calc_Price"] = self.data[self.calc_meth]
             return True
 
         elif self.calc_meth == "median":
 
-            self.data["for_MA_Calc_Price"] = (self.data.high + self.data.low) / 2
+            self.data["Calc_Price"] = (self.data.high + self.data.low) / 2
             return True
 
         elif self.calc_meth == "typical":
 
-            self.data["for_MA_Calc_Price"] = (
+            self.data["Calc_Price"] = (
                 self.data.high + self.data.low + self.data.close
             ) / 3
             return True
 
         elif self.calc_meth == "weighted":
-            self.data["for_MA_Calc_Price"] = (
+            self.data["Calc_Price"] = (
                 self.data.high + self.data.low + 2 * self.data.close
             ) / 4
             return True
@@ -178,7 +178,7 @@ class MovingAverage:
             if self.calc_meth.lower() not in self.whereToApply:
                 raise ValueError("Enter Correct calculator method to calculate SMA. ")
 
-            self.SMA_ = self.data["for_MA_Calc_Price"].mean()
+            self.SMA_ = self.data["Calc_Price"].mean()
             return self.SMA_
         except Exception as e:
             print(e)
@@ -209,7 +209,7 @@ class MovingAverage:
             # OR We can use pandas.dataFrame.ewm method to easily do the job.
 
             self.EMA_ = (
-                self.data[f"for_MA_Calc_Price"]
+                self.data[f"Calc_Price"]
                 .ewm(span=self.period, adjust=False)
                 .mean()
                 .iloc[-1]
@@ -262,12 +262,12 @@ class MovingAverage:
             counter = self.period
 
             for i in range(self.period - 1, 0, -1):
-                tmp_short[counter] = self.data[f"for_MA_Calc_Price"].iloc[i] * counter
+                tmp_short[counter] = self.data[f"Calc_Price"].iloc[i] * counter
                 counter -= 1
 
             self.WMA_ = (
                 np.array(list(tmp_short.values())).sum()
-                + self.data[f"for_MA_Calc_Price"].iloc[0]
+                + self.data[f"Calc_Price"].iloc[0]
             ) / (np.array(list(tmp_short.keys())).sum() + 1)
 
             return self.WMA_
@@ -276,4 +276,28 @@ class MovingAverage:
             return False
 
     def VWMA(self) -> bool:
-        pass
+        try:
+            if not self.Calculate():
+                raise ValueError("Calculation Failed!")
+
+            if self.calc_meth.lower() not in self.whereToApply:
+                raise ValueError("Enter Correct calculator method to calculate EMA. ")
+
+            # Calculate WMA for the shorter Data
+            tmp_short = dict()
+
+            for i in range(self.period - 1, 0, -1):
+
+                tmp_short[self.data[f"tick_volume"].iloc[i]] = (
+                    self.data[f"Calc_Price"].iloc[i] * self.data[f"tick_volume"].iloc[i]
+                )
+
+            self.VWMA_ = (
+                np.array(list(tmp_short.values())).sum()
+                + self.data[f"Calc_Price"].iloc[0] * self.data[f"tick_volume"].iloc[0]
+            ) / (np.array(list(tmp_short.keys())).sum() + 1)
+
+            return self.VWMA_
+        except Exception as e:
+            print(e)
+            return False
