@@ -136,30 +136,30 @@ class MovingAverage:
         self.GetData()
 
         if self.calc_meth in ["close", "open", "high", "low"]:
-            self.data["MA_Calc_Price"] = self.data[self.calc_meth]
+            self.data["for_MA_Calc_Price"] = self.data[self.calc_meth]
             return True
 
         elif self.calc_meth == "median":
 
-            self.data["MA_Calc_Price"] = (self.data.high + self.data.low) / 2
+            self.data["for_MA_Calc_Price"] = (self.data.high + self.data.low) / 2
             return True
 
         elif self.calc_meth == "typical":
 
-            self.data["MA_Calc_Price"] = (
+            self.data["for_MA_Calc_Price"] = (
                 self.data.high + self.data.low + self.data.close
             ) / 3
             return True
 
         elif self.calc_meth == "weighted":
-            self.data["MA_Calc_Price"] = (
+            self.data["for_MA_Calc_Price"] = (
                 self.data.high + self.data.low + 2 * self.data.close
             ) / 4
             return True
         else:
             return False
 
-    def _SMA(self) -> bool:
+    def SMA(self) -> bool:
         """
         SMA(prices: list, period: int) -> bool
         Calculates the Simple Moving Average (SMA).
@@ -172,16 +172,19 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
-            if self.calc_meth.lower() not in self.WhereToApply:
+            if not self.Calculate():
+                raise ValueError("Calculation Failed!")
+
+            if self.calc_meth.lower() not in self.whereToApply:
                 raise ValueError("Enter Correct calculator method to calculate SMA. ")
 
-            self.SMA = self.data["MA_Calc_Price"].mean()
-            return True
+            self.SMA_ = self.data["for_MA_Calc_Price"].mean()
+            return self.SMA_
         except Exception as e:
             print(e)
             return False
 
-    def _EMA(self) -> bool:
+    def EMA(self) -> bool:
         """
         EMA(prices: list, period: int) -> bool
         Calculates the Exponential Moving Average (EMA).
@@ -196,31 +199,28 @@ class MovingAverage:
         - EMA_{t-1} = Previous EMA value
         """
         try:
-            if self.applyWhere.lower() not in self.WhereToApply:
+            if not self.Calculate():
+                raise ValueError("Calculation Failed!")
+
+            if self.calc_meth.lower() not in self.whereToApply:
                 raise ValueError("Enter Correct price input to calculate EMA.")
 
-            self.SMA()
             # EMA is kind of a Recursive FUnction So I have To make a recursive Function in order to calculate the EMA.
             # OR We can use pandas.dataFrame.ewm method to easily do the job.
 
-            self.shorterEMA = (
-                self.shorter_data[f"S_{self.applyWhere}_MA"]
-                .ewm(span=self.short, adjust=False)
+            self.EMA_ = (
+                self.data[f"for_MA_Calc_Price"]
+                .ewm(span=self.period, adjust=False)
                 .mean()
                 .iloc[-1]
             )
-            self.longerEMA = (
-                self.shorter_data[f"S_{self.applyWhere}_MA"]
-                .ewm(span=self.long, adjust=False)
-                .mean()
-                .iloc[-1]
-            )
-            return True
+
+            return self.EMA_
         except Exception as e:
             print(e)
             return False
 
-    def _SMMA(self) -> bool:
+    def SMMA(self) -> bool:
         """
         SMMA(prices: list, period: int) -> bool
         Calculates the Smoothed Moving Average (SMMA).
@@ -237,7 +237,7 @@ class MovingAverage:
         # smma["short"] =
         pass
 
-    def _WMA(self) -> bool:
+    def WMA(self) -> bool:
         """
         WMA(prices: list, period: int) -> bool
         Calculates the Weighted Moving Average (WMA).
@@ -251,44 +251,29 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
-            if self.calc_meth.lower() not in self.WhereToApply:
+            if not self.Calculate():
+                raise ValueError("Calculation Failed!")
+
+            if self.calc_meth.lower() not in self.whereToApply:
                 raise ValueError("Enter Correct calculator method to calculate EMA. ")
 
             # Calculate WMA for the shorter Data
             tmp_short = dict()
-            counter = self.short
+            counter = self.period
 
-            for i in range(self.short - 1, 0, -1):
-                tmp_short[counter] = (
-                    self.shorter_data[f"S_{self.applyWhere}_MA"].iloc[i] * counter
-                )
+            for i in range(self.period - 1, 0, -1):
+                tmp_short[counter] = self.data[f"for_MA_Calc_Price"].iloc[i] * counter
                 counter -= 1
 
-            self.shorterWMA = (
+            self.WMA_ = (
                 np.array(list(tmp_short.values())).sum()
-                + self.shorter_data[f"S_{self.applyWhere}_MA"].iloc[0]
+                + self.data[f"for_MA_Calc_Price"].iloc[0]
             ) / (np.array(list(tmp_short.keys())).sum() + 1)
 
-            # Calculate WMA for the longer Data
-            del tmp_short, counter
-            tmp_short = dict()
-            counter = self.long
-
-            for i in range(self.long - 1, 0, -1):
-                tmp_short[counter] = (
-                    self.longer_data[f"L_{self.applyWhere}_MA"].iloc[i] * counter
-                )
-                counter -= 1
-
-            self.longerWMA = (
-                np.array(list(tmp_short.values())).sum()
-                + self.longer_data[f"L_{self.applyWhere}_MA"].iloc[0]
-            ) / (np.array(list(tmp_short.keys())).sum() + 1)
-
-            return True
+            return self.WMA_
         except Exception as e:
             print(e)
             return False
 
-    def _VWMA(self) -> bool:
+    def VWMA(self) -> bool:
         pass
