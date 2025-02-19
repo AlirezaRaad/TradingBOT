@@ -136,6 +136,7 @@ class MovingAverage:
         """
         This Method Calculates the Corresponding Moving Average Based On MovingAverage.applyWhere
         """
+
         if self.applyWhere == "median":
             self.shorter_data["S_median_MA"] = (
                 self.shorter_data.S_high + self.shorter_data.S_low
@@ -246,6 +247,8 @@ class MovingAverage:
         - N  = Number of periods
         - SMMA_{t-1} = Previous SMMA value
         """
+        # smma = {"short":0, "long":0}
+        # smma["short"] =
         pass
 
     def WMA(self) -> bool:
@@ -258,7 +261,42 @@ class MovingAverage:
 
         Where:
         - Pn = Price at period n
-        - Wn = Weight at period n (typically Wn = n for recent price emphasis)
+        - Wn = Weight at period n (Wn = n for recent price emphasis)
         - N  = Number of periods
         """
-        pass
+        try:
+            # Calculate WMA for the shorter Data
+            tmp_short = dict()
+            counter = self.short
+
+            for i in range(self.short - 1, 0, -1):
+                tmp_short[counter] = (
+                    self.shorter_data[f"S_{self.applyWhere}_MA"].iloc[i] * counter
+                )
+                counter -= 1
+
+            self.shorterWMA = (
+                np.array(list(tmp_short.values())).sum()
+                + self.shorter_data[f"S_{self.applyWhere}_MA"].iloc[0]
+            ) / (np.array(list(tmp_short.keys())).sum() + 1)
+
+            # Calculate WMA for the longer Data
+            del tmp_short, counter
+            tmp_short = dict()
+            counter = self.long
+
+            for i in range(self.long - 1, 0, -1):
+                tmp_short[counter] = (
+                    self.longer_data[f"L_{self.applyWhere}_MA"].iloc[i] * counter
+                )
+                counter -= 1
+
+            self.longerWMA = (
+                np.array(list(tmp_short.values())).sum()
+                + self.longer_data[f"L_{self.applyWhere}_MA"].iloc[0]
+            ) / (np.array(list(tmp_short.keys())).sum() + 1)
+
+            return True
+        except Exception as e:
+            print(e)
+            return False
