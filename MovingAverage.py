@@ -206,8 +206,22 @@ class MovingAverage:
         if self.applyWhere.lower() not in self.WhereToApply:
             raise ValueError("Enter Correct price input to calculate EMA.")
 
-        smoothing_factor = 2 / (self.short + 1)
-        # initial_ema =
+        self.SMA()
+        # EMA is kind of a Recursive FUnction So I have To make a recursive Function in order to calculate the EMA.
+        # OR We can use pandas.dataFrame.ewm method to easily do the job.
+
+        self.shorterEMA = (
+            self.shorter_data[f"S_{self.applyWhere}_MA"]
+            .ewm(span=self.short, adjust=False)
+            .mean()
+            .iloc[-1]
+        )
+        self.longerEMA = (
+            self.shorter_data[f"S_{self.applyWhere}_MA"]
+            .ewm(span=self.long, adjust=False)
+            .mean()
+            .iloc[-1]
+        )
 
     def SMMA(self):
         """
