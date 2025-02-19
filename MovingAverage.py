@@ -159,7 +159,7 @@ class MovingAverage:
         else:
             return False
 
-    def SMA(self) -> bool:
+    def _SMA(self) -> bool:
         """
         SMA(prices: list, period: int) -> bool
         Calculates the Simple Moving Average (SMA).
@@ -172,17 +172,16 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
-            if self.whereToApply.lower() not in self.WhereToApply:
-                raise ValueError("Enter Correct price input to calculate SMA. ")
+            if self.calc_meth.lower() not in self.WhereToApply:
+                raise ValueError("Enter Correct calculator method to calculate SMA. ")
 
-            self.longerMA = self.longer_data[f"L_{self.applyWhere}_MA"].mean()
-            self.shorterMA = self.shorter_data[f"S_{self.applyWhere}_MA"].mean()
+            self.SMA = self.data["MA_Calc_Price"].mean()
             return True
         except Exception as e:
             print(e)
             return False
 
-    def EMA(self) -> bool:
+    def _EMA(self) -> bool:
         """
         EMA(prices: list, period: int) -> bool
         Calculates the Exponential Moving Average (EMA).
@@ -221,7 +220,7 @@ class MovingAverage:
             print(e)
             return False
 
-    def SMMA(self) -> bool:
+    def _SMMA(self) -> bool:
         """
         SMMA(prices: list, period: int) -> bool
         Calculates the Smoothed Moving Average (SMMA).
@@ -238,7 +237,7 @@ class MovingAverage:
         # smma["short"] =
         pass
 
-    def WMA(self) -> bool:
+    def _WMA(self) -> bool:
         """
         WMA(prices: list, period: int) -> bool
         Calculates the Weighted Moving Average (WMA).
@@ -252,8 +251,8 @@ class MovingAverage:
         - N  = Number of periods
         """
         try:
-            if self.applyWhere.lower() not in self.WhereToApply:
-                raise ValueError("Enter Correct price input to calculate EMA.")
+            if self.calc_meth.lower() not in self.WhereToApply:
+                raise ValueError("Enter Correct calculator method to calculate EMA. ")
 
             # Calculate WMA for the shorter Data
             tmp_short = dict()
@@ -291,5 +290,5 @@ class MovingAverage:
             print(e)
             return False
 
-    def VWMA(self) -> bool:
+    def _VWMA(self) -> bool:
         pass
