@@ -159,6 +159,22 @@ class MovingAverage:
         else:
             return False
 
+    def FetchLatestBar(self):
+        """
+        Fetches The Latest bar data.
+        """
+        df = pd.DataFrame(
+            mt5.copy_rates_from_pos(
+                self._sym_bol_, self.alltimeframes[self.timeframe], 0, 1
+            )
+        )
+        df["time"] = pd.to_datetime(df["time"], unit="s", utc=True)
+        df.index = df["time"]
+        df.drop(columns=["time", "real_volume"], inplace=True)
+        df.index.rename("time", inplace=True)
+
+        return df
+
     def SMA(self) -> bool:
         """
         SMA(prices: list, period: int) -> bool
