@@ -122,10 +122,7 @@ class TradingBot:
         """
         from MovingAverage import MovingAverage
 
-        theMA = {"shortMA": dict(), "longMA": dict()}
-
-        # Stores the value of current Moving average based on the given parameters to later compare the most recent Ma number with last one
-        # To see if they Crossed Or Not.
+        # theMA = {"shortMA": dict(), "longMA": dict()}
 
         shorter_MA = MovingAverage(
             kind=kind,
@@ -143,6 +140,9 @@ class TradingBot:
             calc_meth=applyWhere.lower(),
         )
 
+        # Stores the value of current Moving average based on the given parameters to later compare the most recent Ma number with last one
+        # To see if they Crossed Or Not.
+
         # Now It is Time To Implement Strategy.
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
@@ -153,6 +153,15 @@ class TradingBot:
             raise TypeError(
                 "Please Select Your Strategy From TradingBot.availableStrategies"
             )
+
+    def BackupTheData():
+        pass
+
+    def BuyOrder():
+        pass
+
+    def SellOrder():
+        pass
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"
