@@ -75,8 +75,8 @@ class MovingAverage:
     def symbol(self):
         return self._sym_bol_
 
-    @property
-    def alltimeframes(self):
+    @staticmethod
+    def alltimeframes():
         return {
             "1 minute": mt5.TIMEFRAME_M1,
             "2 minutes": mt5.TIMEFRAME_M2,
@@ -119,7 +119,7 @@ class MovingAverage:
     def GetData(self):
         df = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self._sym_bol_, self.alltimeframes[self.timeframe], 0, self.period
+                self._sym_bol_, self.alltimeframes()[self.timeframe], 0, self.period
             )
         )
         df["time"] = pd.to_datetime(df["time"], unit="s", utc=True)
@@ -162,13 +162,14 @@ class MovingAverage:
         else:
             return False
 
-    def FetchLatestBar(self):
+    @staticmethod
+    def FetchLatestBar(obj):
         """
         Fetches The Latest bar data.
         """
         df = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self._sym_bol_, self.alltimeframes[self.timeframe], 0, 1
+                obj.symbol, MovingAverage.alltimeframes()[obj.timeframe], 0, 1
             )
         )
         df["time"] = pd.to_datetime(df["time"], unit="s", utc=True)

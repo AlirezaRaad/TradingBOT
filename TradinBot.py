@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 from typing import Optional, Literal
+from types import SimpleNamespace
 
 
 # TODO: DONT FORGET TO ADD SQL DATABASE.
@@ -159,10 +160,33 @@ class TradingBot:
 
         theMA = {"shortMA": dict(), "longMA": dict()}
 
-        # for i in range(2):
-        #     theMA["shortMA"][i] =
+        while True:
 
-        print(longerMethod(), shorterMethod())
+            theMA["shortMA"][0] = shorterMethod()
+            theMA["longMA"][0] = longerMethod()
+
+            latestAddedRowIndex = (
+                shorter_MA.data.index[-1]
+                if shorter_MA.data.index[-1] > longer_MA.data.index[-1]
+                else longer_MA.data.index[-1]
+            )
+
+            objToPass = SimpleNamespace(symbol=symbol, timeframe=timeFrame)
+            newestRow = MovingAverage.FetchLatestBar(obj=objToPass)
+
+            # TODO: WRONG IF/ELSE
+            if newestRow.index > latestAddedRowIndex:
+                theMA["shortMA"][1] = shorterMethod()
+                theMA["longMA"][1] = longerMethod()
+            else:
+                theMA["shortMA"][1] = np.nan
+                theMA["longMA"][1] = np.nan
+
+            print(theMA)
+
+            import time
+
+            time.sleep(10)
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
