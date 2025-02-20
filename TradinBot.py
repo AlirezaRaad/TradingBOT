@@ -5,6 +5,7 @@ import datetime as dt
 from typing import Optional, Literal
 
 
+# TODO: DONT FORGET TO ADD SQL DATABASE.
 class TradingBot:
     """
     This Bot Will Trade Based On Given Parameter and Strategies.
@@ -72,7 +73,7 @@ class TradingBot:
         nShortCandle: int,
         nLongCandle: int,
         kind: Literal["SMA", "EMA", "VWMA", "WMA"],
-        shorterTf: Literal[
+        timeFrame: Literal[
             "1 minute",
             "2 minutes",
             "3 minutes",
@@ -95,31 +96,6 @@ class TradingBot:
             "1 week",
             "1 month",
         ],
-        longerTf: Optional[
-            Literal[
-                "1 minute",
-                "2 minutes",
-                "3 minutes",
-                "4 minutes",
-                "5 minutes",
-                "6 minutes",
-                "10 minutes",
-                "12 minutes",
-                "15 minutes",
-                "20 minutes",
-                "30 minutes",
-                "1 hour",
-                "2 hours",
-                "3 hours",
-                "4 hours",
-                "6 hours",
-                "8 hours",
-                "12 hours",
-                "1 day",
-                "1 week",
-                "1 month",
-            ]
-        ] = None,
         applyWhere: Literal[
             "close",
             "open",
@@ -131,16 +107,13 @@ class TradingBot:
         ] = "median ",
     ):
         """
-        shorterTf : Shorter-term MA Time Frame
-        longerTf : Longer-term MA Time Frame. Dont Give Value To Use Shorter-term MA Time Frame
-
-        If you dont provide a TimeFrame For longerTf, it will get shorterTf value.
+        timeFrame : MA Time Frame
 
         nShortCandle : Number Of Candles With You Selected in shorterTf.
         nLongCandle : Number Of Candles With You Selected in longerTf.
 
         example:
-        \tnShortCandle = 50 & nLongCandle = 200 & shorterTf 10 minutes -> bring 50 of most recent 10min bars data. BECAUSE we did not provide longerTf, it will bring 200 of most recent 10min bars data.
+        \tnShortCandle = 50 & nLongCandle = 200 & timeFrame 10 minutes -> bring 50 of most recent 10min bars data for shorter MA and bring 200 of most recent 10min bars for the longer MA.
         ------------------------
         You Can Select You Short-Term and Long-term MA to trigger BUY/SELL orders.
 
@@ -148,9 +121,6 @@ class TradingBot:
 
         """
         from MovingAverage import MovingAverage
-
-        if longerTf is None:
-            longerTf = shorterTf
 
         theMA = {"shortMA": dict(), "longMA": dict()}
 
@@ -161,7 +131,7 @@ class TradingBot:
             kind=kind,
             symbol=symbol,
             period=nShortCandle,
-            timeframe=shorterTf,
+            timeframe=timeFrame,
             calc_meth=applyWhere.lower(),
         )
 
@@ -169,7 +139,7 @@ class TradingBot:
             kind=kind,
             symbol=symbol,
             period=nLongCandle,
-            timeframe=longerTf,
+            timeframe=timeFrame,
             calc_meth=applyWhere.lower(),
         )
 
