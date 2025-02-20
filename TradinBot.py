@@ -59,16 +59,19 @@ class TradingBot:
     @property
     def availableStrategies(self):
         print(
-            f"Available Strategies:\n\tMA : Moving Average(Fully customizable at TradingBot.MovingAverage())\n\tRSI : "
+            f"Available Strategies:\n\tMA : Moving Average CrossOver\n\tBuy (Golden Cross) → When the shorter moving average crosses above the longer moving average.\n\t"
+            + f"Sell (Death Cross) → When the shorter moving average crosses below the longer moving average.\n\t--------------------"
+            + f"\n\tRSI : (Coming Soon)"
         )
-        return {"MA": "MA", "RSI": "RSI"}
+        # return {"MA": "MA", "RSI": "RSI"}
+        return {"MA": "MA"}
 
     def MovingAverage(
         self,
         symbol,
-        shorterMA: int,
-        longerMA: int,
-        formulas: Literal["SMA", "EMA", "SMMA", "WMA"],
+        nShortCandle: int,
+        nLongCandle: int,
+        kind: Literal["SMA", "EMA", "VWMA", "WMA"],
         shorterTf: Literal[
             "1 minute",
             "2 minutes",
@@ -118,49 +121,59 @@ class TradingBot:
             ]
         ] = None,
         applyWhere: Literal[
-            "Close",
-            "Open",
-            "High",
-            "Low",
-            "Median",
-            "Typical",
-            "Weighted",
-        ] = "Median ",
+            "close",
+            "open",
+            "high",
+            "low",
+            "median",
+            "typical",
+            "weighted",
+        ] = "median ",
     ):
         """
-        shorterMA : Shorter-term MA
-        longerMA : Longer-term MA
-
         shorterTf : Shorter-term MA Time Frame
         longerTf : Longer-term MA Time Frame. Dont Give Value To Use Shorter-term MA Time Frame
+
+        If you dont provide a TimeFrame For longerTf, it will get shorterTf value.
+
+        nShortCandle : Number Of Candles With You Selected in shorterTf.
+        nLongCandle : Number Of Candles With You Selected in longerTf.
+
+        example:
+        \tnShortCandle = 50 & nLongCandle = 200 & shorterTf 10 minutes -> bring 50 of most recent 10min bars data. BECAUSE we did not provide longerTf, it will bring 200 of most recent 10min bars data.
         ------------------------
         You Can Select You Short-Term and Long-term MA to trigger BUY/SELL orders.
 
         ------------------------
 
         """
+        from MovingAverage import MovingAverage
+
         if longerTf is None:
             longerTf = shorterTf
-        match formulas.upper():
-            case "SMA":
-                sma = MovingAverage(
-                    kind="SMA",
-                    symbol=symbol,
-                    short=shorterMA,
-                    long=longerMA,
-                    shortTf=shorterTf,
-                    longTf=longerTf,
-                    applyWhere=applyWhere,
-                )
-                return sma.SMA()
-            case "EMA":
-                pass
-            case "SMMA":
-                pass
-            case "WMA":
-                pass
-            case _:
-                raise TypeError("Please SElect Correct Formula.")
+
+        theMA = {"shortMA": dict(), "longMA": dict()}
+
+        # Stores the value of current Moving average based on the given parameters to later compare the most recent Ma number with last one
+        # To see if they Crossed Or Not.
+
+        shorter_MA = MovingAverage(
+            kind=kind,
+            symbol=symbol,
+            period=nShortCandle,
+            timeframe=shorterTf,
+            calc_meth=applyWhere.lower(),
+        )
+
+        longerTf_MA = MovingAverage(
+            kind=kind,
+            symbol=symbol,
+            period=nLongCandle,
+            timeframe=longerTf,
+            calc_meth=applyWhere.lower(),
+        )
+
+        # Now It is Time To Implement Strategy.
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
