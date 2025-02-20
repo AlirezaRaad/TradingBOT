@@ -122,8 +122,10 @@ class TradingBot:
         """
         from MovingAverage import MovingAverage
 
-        # theMA = {"shortMA": dict(), "longMA": dict()}
+        if kind not in MovingAverage.AllMAs():
+            raise TypeError("Please Provide The CORRECT MA METHOD.")
 
+        # Creating Shorter MovingAverage Class with its correct MA method.
         shorter_MA = MovingAverage(
             kind=kind,
             symbol=symbol,
@@ -132,7 +134,11 @@ class TradingBot:
             calc_meth=applyWhere.lower(),
         )
 
-        longerTf_MA = MovingAverage(
+        shorterMethod = getattr(shorter_MA, kind)
+
+        # --------------------------------------------#
+
+        longer_MA = MovingAverage(
             kind=kind,
             symbol=symbol,
             period=nLongCandle,
@@ -140,10 +146,23 @@ class TradingBot:
             calc_meth=applyWhere.lower(),
         )
 
+        longerMethod = getattr(longer_MA, kind)
         # Stores the value of current Moving average based on the given parameters to later compare the most recent Ma number with last one
         # To see if they Crossed Or Not.
 
+        # For the MA crossover strategy I need to have the previous MA and the current MA to see the if they crossed or no.
+        # I have to remember that from the time of running the script the crossover maters.
+
         # Now It is Time To Implement Strategy.
+
+        # I will create a loop with a dict and alway keep two element in the dict.
+
+        theMA = {"shortMA": dict(), "longMA": dict()}
+
+        # for i in range(2):
+        #     theMA["shortMA"][i] =
+
+        print(longerMethod(), shorterMethod())
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """

@@ -113,6 +113,9 @@ class MovingAverage:
             "weighted",
         }
 
+    def AllMAs():
+        return ("SMA", "EMA", "WMA", "VWMA")
+
     def GetData(self):
         df = pd.DataFrame(
             mt5.copy_rates_from_pos(
