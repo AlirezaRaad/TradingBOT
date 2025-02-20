@@ -220,23 +220,6 @@ class MovingAverage:
             print(e)
             return False
 
-    def SMMA(self) -> bool:
-        """
-        SMMA(prices: list, period: int) -> bool
-        Calculates the Smoothed Moving Average (SMMA).
-
-        Formula:
-        SMMA_t = (SMMA_{t-1} * (N - 1) + P_t) / N
-
-        Where:
-        - P_t = Current price
-        - N  = Number of periods
-        - SMMA_{t-1} = Previous SMMA value
-        """
-        # smma = {"short":0, "long":0}
-        # smma["short"] =
-        pass
-
     def WMA(self) -> bool:
         """
         WMA(prices: list, period: int) -> bool
