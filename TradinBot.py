@@ -222,19 +222,29 @@ class TradingBot:
         pass
 
     @staticmethod
-    def BuyOrder(obj, symbol, atrMult: float = 1.5, RR: float = 2):
-        if len(mt5.positions_get()) != 0:
-            # Dont Execute Action.
-            return False
+    def AtrForBuySell(obj, window=14, atrMult: float = 1.5):
+        """
+        Calculate ATR and return the ATR value.
+        """
 
         df = obj.data.copy()
         df["high-low"] = df["high"] - df["low"]
         df["high-close"] = np.abs(df["high"] - df["close"].shift(1))
         df["low-close"] = np.abs(df["low"] - df["close"].shift(1))
         df["tr"] = df[["high-low", "high-close", "low-close"]].max(axis=1)
-        atr = df["tr"].rolling(14).mean().iloc[-1]  # 14-period ATR
+        atr = df["tr"].rolling(window).mean().iloc[-1]  # 14-period ATR
+
+        return atr
+
+    @staticmethod
+    def BuyOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
+        if len(mt5.positions_get()) != 0:
+            # Dont Execute Action.
+            return False
 
         price = mt5.symbol_info_tick(symbol).ask
+
+        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow, atrMult=atrMult)
 
         sl = price - atrMult * atr
         tp = price + atrMult * RR * atr
@@ -255,19 +265,14 @@ class TradingBot:
         return mt5.order_send(request)
 
     @staticmethod
-    def SellOrder(obj, symbol, atrMult: float = 1.5, RR: float = 2):
+    def SellOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
         if len(mt5.positions_get()) != 0:
             # Dont Execute Action.
             return False
 
         price = mt5.symbol_info_tick(symbol).bid
 
-        df = obj.data.copy()
-        df["high-low"] = df["high"] - df["low"]
-        df["high-close"] = np.abs(df["high"] - df["close"].shift(1))
-        df["low-close"] = np.abs(df["low"] - df["close"].shift(1))
-        df["tr"] = df[["high-low", "high-close", "low-close"]].max(axis=1)
-        atr = df["tr"].rolling(14).mean().iloc[-1]  # 14-period ATR
+        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow, atrMult=atrMult)
 
         sl = price + atrMult * atr
         tp = price - atrMult * RR * atr
