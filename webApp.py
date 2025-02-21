@@ -58,6 +58,7 @@ st.header("Now Lets make our Bot", divider="rainbow")
 if "step" not in st.session_state:
     st.session_state.step = 1
 
+
 if "changed_flag" not in st.session_state:
     st.session_state.changed_flag = None
 
@@ -77,13 +78,26 @@ def confirm_change():
     st.session_state.changed_flag = False
 
 
+if "start_trading" not in st.session_state:
+    st.session_state.start_trading = False  # Controls whether inputs are locked
+
 if "allUserTypedData" not in st.session_state:
     st.session_state.allUserTypedData = {}
 
+if "lock_inputs" not in st.session_state:
+    st.session_state.lock_inputs = False  # Controls whether inputs are locked
+
+
+def confirm_and_lock():
+    """Locks all input fields once the user confirms their credentials."""
+    st.session_state.lock_inputs = True
+
 
 # Display different content based on the current step
+
+# -------------------START | LOG IN-----------------------------#
 if st.session_state.step == 1:
-    # -------------------START | LOG IN-----------------------------#
+
     st.header("Enter Your Credential.")
     st.markdown(
         """<b><p style="font-size:22px">
@@ -104,19 +118,30 @@ if st.session_state.step == 1:
             "Enter your username:",
             key="USER_username",
             type="default",
+            disabled=st.session_state.lock_inputs,
         )
     with passwordCol:
         user_password = st.text_input(
-            "Enter your password:", key="USER_password", type="password"
+            "Enter your password:",
+            key="USER_password",
+            type="password",
+            disabled=st.session_state.lock_inputs,
         )
 
-    user_server = st.text_input("Enter your server:", key="USER_server", type="default")
+    user_server = st.text_input(
+        "Enter your server:",
+        key="USER_server",
+        type="default",
+        disabled=st.session_state.lock_inputs,
+    )
 
     confirmedCredential = st.checkbox("Confirm and Lock Inputs to see next Step.")
     if confirmedCredential:
         try:
             st.session_state.tb = TradingBot(
-                username=int(user_username), password=user_password, server=user_server
+                username=int(user_username),
+                password=user_password,
+                server=user_server,
             )
             st.session_state.tb.connect()
 
@@ -133,17 +158,22 @@ if st.session_state.step == 1:
                 """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
                 unsafe_allow_html=True,
             )
+
 # -------------------END | LOG IN-----------------------------#
 
+# -------------------START | SELECT INSTRUMENT-----------------------------#
 elif st.session_state.step == 2:
-    # -------------------START | SELECT INSTRUMENT-----------------------------#
+
     st.header("SELECT INSTRUMENT")
 
     user_symbol = st.selectbox(
-        "Pick a INSTRUMENT:", list(st.session_state.tb.available_symbols)
+        "Pick a INSTRUMENT:",
+        list(st.session_state.tb.available_symbols),
+        disabled=st.session_state.lock_inputs,
     )
 
-    st.session_state.allUserTypedData["symbol"] = user_symbol
+    if not st.session_state.lock_inputs:
+        st.session_state.allUserTypedData["symbol"] = user_symbol
 
     col1, col2 = st.columns(2)
     with col1:
@@ -156,8 +186,9 @@ elif st.session_state.step == 2:
 
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
+# -------------------START | SELECT PRICE CALCULATION-----------------------------#
 elif st.session_state.step == 3:
-    # -------------------START | SELECT PRICE CALCULATION-----------------------------#
+
     st.header("SELECT HOW YOU WANT TO CALCULATE PRICE THAT WITH USE IN MOVING AVERAGES")
 
     user_calc_method = st.selectbox(
@@ -173,9 +204,11 @@ elif st.session_state.step == 3:
                 "weighted",
             }
         ),
+        disabled=st.session_state.lock_inputs,
     )
 
-    st.session_state.allUserTypedData["calc_meth"] = user_calc_method
+    if not st.session_state.lock_inputs:
+        st.session_state.allUserTypedData["calc_meth"] = user_calc_method
 
     col1, col2 = st.columns(2)
     with col1:
@@ -186,17 +219,26 @@ elif st.session_state.step == 3:
         st.button("Confirm Change", on_click=confirm_change)
 # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
+# -------------------START | SELECT STRATEGY-----------------------------#
 elif st.session_state.step == 4:
-    # -------------------START | SELECT STRATEGY-----------------------------#
+
     st.header("SELECT STRATEGY AND ITS KIND")
 
     options = {"MA CrossOvers": ["SMA", "EMA", "WMA", "VWMA"]}
 
     # First dropdown: Select Strategy
-    category = st.selectbox("Select a category:", list(options.keys()))
+    category = st.selectbox(
+        "Select a category:",
+        list(options.keys()),
+        disabled=st.session_state.lock_inputs,
+    )
 
     # Second dropdown: Depends on first selection
-    sub_item = st.selectbox("Select an Calculation Strategy:", options[category])
+    sub_item = st.selectbox(
+        "Select an Calculation Strategy:",
+        options[category],
+        disabled=st.session_state.lock_inputs,
+    )
 
     st.markdown(
         f"""<b><p style="font-size:22px">You selected: <font color='blue'>{category}</font> with <font color='crimson'>{sub_item}</font> as its calculation method.</p></b>
@@ -205,7 +247,11 @@ elif st.session_state.step == 4:
         unsafe_allow_html=True,
     )
 
-    st.session_state.allUserTypedData["strategy"] = {"tool": category, "kind": sub_item}
+    if not st.session_state.lock_inputs:
+        st.session_state.allUserTypedData["strategy"] = {
+            "tool": category,
+            "kind": sub_item,
+        }
 
     col1, col2 = st.columns(2)
     with col1:
@@ -217,8 +263,9 @@ elif st.session_state.step == 4:
         st.button("Confirm Change", on_click=confirm_change)
 # -------------------END | SELECT STRATEGY-----------------------------#
 
+# -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
 elif st.session_state.step == 5:
-    # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+
     st.header("SELECTING THE PERIODS")
     increase_value_of_slider = st.checkbox(
         "Check Me if you want to increase max value of Shorter and Longer period to 99999"
@@ -230,17 +277,21 @@ elif st.session_state.step == 5:
             "Chose the shorter period For Moving Average",
             min_value=1,
             max_value=99999 if increase_value_of_slider else 50,
+            disabled=st.session_state.lock_inputs,
         )
     with lpCol:
         longererPeriodBar = st.slider(
             "Chose the Longer period For Moving Average",
             min_value=1,
             max_value=99999 if increase_value_of_slider else 200,
+            disabled=st.session_state.lock_inputs,
         )
-    st.session_state.allUserTypedData["periods"] = {
-        "long": longererPeriodBar,
-        "short": shorterPeriodBar,
-    }
+
+    if not st.session_state.lock_inputs:
+        st.session_state.allUserTypedData["periods"] = {
+            "long": longererPeriodBar,
+            "short": shorterPeriodBar,
+        }
 
     col1, col2 = st.columns(2)
     with col1:
@@ -254,10 +305,6 @@ elif st.session_state.step == 5:
 
 elif st.session_state.step == 6:
     st.header("Confirmation")
-    st.markdown(
-        f"""{st.session_state.allUserTypedData}""",
-        unsafe_allow_html=True,
-    )
     st.markdown(
         f"""<b><p style="font-size:22px">
     1. Instrument : {st.session_state.allUserTypedData["symbol"]}</br>
@@ -300,10 +347,8 @@ elif st.session_state.step == 6:
     no = st.checkbox("No", value=st.session_state.no_checked, on_change=update_no)
 
     if UserLastQuestion == "Yes":
-        st.markdown(
-            f"""{st.session_state.allUserTypedData}""",
-            unsafe_allow_html=True,
-        )
+        confirm_and_lock()  # Refresh the app to immediately disable inputs
+        st.session_state.start_trading = True
 
     elif UserLastQuestion == "No":
         st.markdown(
@@ -327,7 +372,32 @@ elif st.session_state.step == 6:
             f"""<font color='crismon'><b><p style="font-size:22px">Click button bellow to go to your desired step.</p></b></font>""",
             unsafe_allow_html=True,
         )
+
         if st.button("Click"):
             st.session_state.step = allTheStepsdict[user_step_to_return]
 
             st.session_state.changed_flag = True
+
+
+st.session_state.start_trading = True
+if st.session_state.start_trading:
+    st.header("Running The Bot", divider="rainbow")
+
+    st.session_state.allUserTypedData
+
+    if st.session_state.allUserTypedData["strategy"]["tool"] == "MA CrossOvers":
+        st.session_state.tb.MovingAverage(
+            symbol=st.session_state.allUserTypedData["symbol"],
+            nLongCandle=st.session_state.allUserTypedData["period"]["long"],
+            nShortCandle=st.session_state.allUserTypedData["period"]["short"],
+            timeFrame="1 minute",
+            kind=["strategy"]["kind"],
+            applyWhere=st.session_state.allUserTypedData["calc_meth"],
+            atrMultiplier=1.5,
+            RR=2,
+        )
+
+    st.markdown(
+        f"""<b><p style="font-size:25px">Bot is running!!""",
+        unsafe_allow_html=True,
+    )
