@@ -117,7 +117,7 @@ if st.session_state.step == 1:
                 unsafe_allow_html=True,
             )
 
-    # -------------------END | LOG IN-----------------------------#
+# -------------------END | LOG IN-----------------------------#
 
 elif st.session_state.step == 2:
     # -------------------START | SELECT INSTRUMENT-----------------------------#
@@ -137,35 +137,35 @@ elif st.session_state.step == 2:
 elif st.session_state.step == 3:
     # -------------------START | SELECT PRICE CALCULATION-----------------------------#
     st.header("SELECT PRICE CALCULATION", divider="rainbow")
-    # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back", on_click=prev_step)
     with col2:
         st.button("Next", on_click=next_step)
+# -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
 elif st.session_state.step == 4:
     # -------------------START | SELECT STRATEGY-----------------------------#
     st.header("SELECT STRATEGY")
-    # -------------------END | SELECT STRATEGY-----------------------------#
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back", on_click=prev_step)
     with col2:
         st.button("Next", on_click=next_step)
+# -------------------END | SELECT STRATEGY-----------------------------#
 
 elif st.session_state.step == 5:
     # -------------------START | MOVING AVERAGE KIND-----------------------------#
     st.header("MOVING AVERAGE KIND")
-    # -------------------END | MOVING AVERAGE KIND-----------------------------#
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back", on_click=prev_step)
     with col2:
         st.button("Next", on_click=next_step)
+# -------------------END | MOVING AVERAGE KIND-----------------------------#
 
 elif st.session_state.step == 6:
     # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
@@ -187,9 +187,10 @@ elif st.session_state.step == 6:
             min_value=1,
             max_value=99999 if increase_value_of_slider else 200,
         )
-    # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+
     col1, col2 = st.columns(2)
     with col1:
         st.button("Back", on_click=prev_step)
     with col2:
         st.button("Next", on_click=next_step)
+# -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#

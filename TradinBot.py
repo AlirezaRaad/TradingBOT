@@ -241,7 +241,7 @@ class TradingBot:
         pass
 
     @staticmethod
-    def AtrForBuySell(obj, window=14, atrMult: float = 1.5):
+    def AtrForBuySell(obj, window=14):
         """
         Calculate ATR and return the ATR value.
         """
@@ -263,7 +263,7 @@ class TradingBot:
 
         price = mt5.symbol_info_tick(symbol).ask
 
-        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow, atrMult=atrMult)
+        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow)
 
         sl = price - atrMult * atr
         tp = price + atrMult * RR * atr
@@ -291,7 +291,7 @@ class TradingBot:
 
         price = mt5.symbol_info_tick(symbol).bid
 
-        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow, atrMult=atrMult)
+        atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow)
 
         sl = price + atrMult * atr
         tp = price - atrMult * RR * atr
