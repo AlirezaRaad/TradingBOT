@@ -136,7 +136,25 @@ elif st.session_state.step == 2:
 
 elif st.session_state.step == 3:
     # -------------------START | SELECT PRICE CALCULATION-----------------------------#
-    st.header("SELECT PRICE CALCULATION", divider="rainbow")
+    st.header(
+        "SELECT HOW YOU WANT TO CALCULATE PRICE THAT WITH USE IN MOVING AVERAGES",
+        divider="rainbow",
+    )
+
+    user_calc_method = st.selectbox(
+        "Pick a INSTRUMENT:",
+        list(
+            {
+                "close",
+                "open",
+                "high",
+                "low",
+                "median",
+                "typical",
+                "weighted",
+            }
+        ),
+    )
 
     col1, col2 = st.columns(2)
     with col1:
@@ -147,7 +165,24 @@ elif st.session_state.step == 3:
 
 elif st.session_state.step == 4:
     # -------------------START | SELECT STRATEGY-----------------------------#
-    st.header("SELECT STRATEGY")
+    st.header("SELECT STRATEGY AND ITS KIND")
+    options = {"MA CrossOvers": ["SMA", "EMA", "WMA", "VWMA"]}
+
+    # First dropdown: Select Strategy
+    category = st.selectbox("Select a category:", list(options.keys()))
+
+    # Second dropdown: Depends on first selection
+    sub_item = st.selectbox("Select an Calculation Strategy:", options[category])
+
+    st.markdown(
+        f"""<b><p style="font-size:22px">You selected: <font color='blue'>{category}</font> with <font color='crimson'>{sub_item}</font> as its calculation method.</p></b>
+            
+            """,
+        unsafe_allow_html=True,
+    )
+
+    user_startegy = category
+    use_strategy_kind = sub_item
 
     col1, col2 = st.columns(2)
     with col1:
@@ -156,15 +191,6 @@ elif st.session_state.step == 4:
         st.button("Next", on_click=next_step)
 # -------------------END | SELECT STRATEGY-----------------------------#
 
-elif st.session_state.step == 5:
-    # -------------------START | MOVING AVERAGE KIND-----------------------------#
-    st.header("MOVING AVERAGE KIND")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Back", on_click=prev_step)
-    with col2:
-        st.button("Next", on_click=next_step)
 # -------------------END | MOVING AVERAGE KIND-----------------------------#
 
 elif st.session_state.step == 6:
@@ -176,17 +202,20 @@ elif st.session_state.step == 6:
     spCol, lpCol = st.columns(2)  # Short Period, LongPeriod
 
     with spCol:
-        st.slider(
+        shorterPeriodBar = st.slider(
             "Chose the shorter period For Moving Average",
             min_value=1,
             max_value=99999 if increase_value_of_slider else 50,
         )
     with lpCol:
-        st.slider(
+        longererPeriodBar = st.slider(
             "Chose the Longer period For Moving Average",
             min_value=1,
             max_value=99999 if increase_value_of_slider else 200,
         )
+
+    user_short_period = shorterPeriodBar
+    user_long_period = longererPeriodBar
 
     col1, col2 = st.columns(2)
     with col1:
