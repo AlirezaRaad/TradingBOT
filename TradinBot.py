@@ -178,6 +178,7 @@ class TradingBot:
         )
 
         while True:
+
             # Calculate new values
             new_shorter = shorterMA()
             new_longer = longerMA()
@@ -186,8 +187,13 @@ class TradingBot:
             longer_ma.append(new_longer)
 
             # Check for Golden Cross
-
             if len(shorter_ma) == 2:
+
+                while True:
+                    # If we have an open Position, do now check and go for another one. Prevent to open Two Positions.
+                    if len(mt5.positions_get()) != 0:
+                        break
+
                 if shorter_ma[0] < longer_ma[0] and shorter_ma[1] > longer_ma[1]:
                     print("BUY signal detected!")
                     self.BuyOrder(
