@@ -4,6 +4,7 @@ import numpy as np
 import datetime as dt
 from typing import Optional, Literal
 from types import SimpleNamespace
+from collections import deque
 
 
 # TODO: DONT FORGET TO ADD SQL DATABASE.
@@ -127,7 +128,7 @@ class TradingBot:
             raise TypeError("Please Provide The CORRECT MA METHOD.")
 
         # Creating Shorter MovingAverage Class with its correct MA method.
-        shorter_MA = MovingAverage(
+        shorterMovingAverage = MovingAverage(
             kind=kind,
             symbol=symbol,
             period=nShortCandle,
@@ -135,11 +136,10 @@ class TradingBot:
             calc_meth=applyWhere.lower(),
         )
 
-        shorterMethod = getattr(shorter_MA, kind)
+        shorterMA = getattr(shorterMovingAverage, kind)
 
         # --------------------------------------------#
-
-        longer_MA = MovingAverage(
+        longerMovingAverage = MovingAverage(
             kind=kind,
             symbol=symbol,
             period=nLongCandle,
@@ -147,9 +147,9 @@ class TradingBot:
             calc_meth=applyWhere.lower(),
         )
 
-        longerMethod = getattr(longer_MA, kind)
-        # Stores the value of current Moving average based on the given parameters to later compare the most recent Ma number with last one
-        # To see if they Crossed Or Not.
+        longerMA = getattr(longerMovingAverage, kind)
+
+        # --------------------------------------------#
 
         # For the MA crossover strategy I need to have the previous MA and the current MA to see the if they crossed or no.
         # I have to remember that from the time of running the script the crossover maters.
@@ -158,35 +158,41 @@ class TradingBot:
 
         # I will create a loop with a dict and alway keep two element in the dict.
 
-        theMA = {"shortMA": dict(), "longMA": dict()}
+        # I dont Need to store values and constantly check if a new time has added or not.
+
+        # We you fetch the last n bars it gives you the Last n bars up until that moment, it means if you fetch it
+        # Constantly it will automatically update the last price.
+
+        shorter_ma = deque(maxlen=2)
+        longer_ma = deque(maxlen=2)
+
+        # First-time initialization
+        shorter_ma.append(shorterMA())
+        longer_ma.append(longerMA())
 
         while True:
+            # Calculate new values
+            new_shorter = shorterMA()
+            new_longer = longerMA()
 
-            theMA["shortMA"][0] = shorterMethod()
-            theMA["longMA"][0] = longerMethod()
+            shorter_ma.append(new_shorter)
+            longer_ma.append(new_longer)
 
-            latestAddedRowIndex = (
-                shorter_MA.data.index[-1]
-                if shorter_MA.data.index[-1] > longer_MA.data.index[-1]
-                else longer_MA.data.index[-1]
-            )
+            # Check for Golden Cross
+            if (
+                len(shorter_ma) == 2
+                and shorter_ma[0] < longer_ma[0]
+                and shorter_ma[1] > longer_ma[1]
+            ):
+                print("BUY signal detected!")
 
-            objToPass = SimpleNamespace(symbol=symbol, timeframe=timeFrame)
-            newestRow = MovingAverage.FetchLatestBar(obj=objToPass)
-
-            # TODO: WRONG IF/ELSE
-            if newestRow.index > latestAddedRowIndex:
-                theMA["shortMA"][1] = shorterMethod()
-                theMA["longMA"][1] = longerMethod()
-            else:
-                theMA["shortMA"][1] = np.nan
-                theMA["longMA"][1] = np.nan
-
-            print(theMA)
-
-            import time
-
-            time.sleep(10)
+            # Check for Death Cross
+            elif (
+                len(shorter_ma) == 2
+                and shorter_ma[0] > longer_ma[0]
+                and shorter_ma[1] < longer_ma[1]
+            ):
+                print("SELL signal detected!")
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
