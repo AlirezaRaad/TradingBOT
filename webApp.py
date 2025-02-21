@@ -1,4 +1,5 @@
 import streamlit as st
+from TradinBot import TradingBot
 
 st.header("Raad Algoritmic TradingBot", divider="rainbow")
 
@@ -32,27 +33,66 @@ st.markdown(
     """<p style="font-size:20px">
     This <font color='hotpink'><b>ALGORITHMIC TRADING BOT</b></font> will trade based on classic Indicator and their strategies.<br><br>
             In the Version 1.0.0 I just added Moving Average CrossOvers which you can see the details in Selecting Strategy option.<br><br>
-            For Seeing what will be added with later updates, see sidebar :red['What will be Added in Future Version?'] Section
+            For Seeing what will be added with later updates, see sidebar <font color='red'>'What will be Added in Future Version?'</font> Section
         </p>
 """,
     unsafe_allow_html=True,
 )
 st.header("How it will work", divider="rainbow")
 st.markdown(
-    """<p style="font-size:20px">
+    """<b><p style="font-size:22px">
     1. You Need to log in into your MetaTrader5 account.<br>
     2. You Need to select the instrument which your broker also provides.<br>
     3. You Need to Select your Strategies.<br>
     4. You need to select which price calculation method you want to use.<br>
     5.You Need To Select Which Moving Average formula you want to use.<br>
     6. You just need to select your LONGER/SHORTER period for you.<br>
-    </p>
+    </p></b>
 
 """,
     unsafe_allow_html=True,
 )
 # -------------------START | LOG IN-----------------------------#
+st.header("1. Enter Your Credential.", divider="rainbow")
+st.markdown(
+    """<b><p style="font-size:22px">
+    Enter you username/password and the server which you are connect with in mt5 app.</br>
+    <font color='orange'>YOU can find your credentials under Tools -> Options -> Server</font>
+    </p></b>
 
+""",
+    unsafe_allow_html=True,
+)
+# Create 2 column to get Username/Password and 1 for Server
+usernameCol, passwordCol = st.columns(spec=2, vertical_alignment="center", gap="large")
+
+with usernameCol:
+    user_username = st.text_input(
+        "Enter your username:",
+        key="USER_username",
+        type="default",
+    )
+with passwordCol:
+    user_password = st.text_input(
+        "Enter your password:", key="USER_password", type="password"
+    )
+
+
+user_server = st.text_input("Enter your server:", key="USER_server", type="default")
+
+confirmedCredential = st.checkbox("Confirm and Lock Inputs")
+if confirmedCredential:
+    try:
+        tb = TradingBot(
+            username=int(user_username), password=user_password, server=user_server
+        )
+        tb.connect()
+        confirmedCredential
+    except:
+        st.markdown(
+            """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
+            unsafe_allow_html=True,
+        )
 
 # -------------------END | LOG IN-----------------------------#
 
