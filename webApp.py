@@ -41,18 +41,19 @@ st.markdown(
 st.header("How it will work", divider="rainbow")
 st.markdown(
     """<b><p style="font-size:22px">
-    1. You Need to log in into your MetaTrader5 account.<br>
-    2. You Need to select the instrument which your broker also provides.<br>
-    3. You Need to Select your Strategies.<br>
-    4. You need to select which price calculation method you want to use.<br>
-    5.You Need To Select Which Moving Average formula you want to use.<br>
-    6. You just need to select your LONGER/SHORTER period for you.<br>
+    1. You Need to <font color='aqua'>log in</font> into your MetaTrader5 account.<br>
+    2. You Need to select the <font color='aqua'>instrument</font> which your broker also provides.<br>
+    3. You need to select which <font color='aqua'>price calculation method</font> you want to use.<br>
+    4. You Need to Select your <font color='aqua'>Strategies.</font><br>
+    5. You Need To Select Which <font color='aqua'>Moving Average formula</font> you want to use.<br>
+    6. You just need to select your <font color='aqua'>LONGER/SHORTER period</font> for you.<br>
     </p></b>
 
 """,
     unsafe_allow_html=True,
 )
 # -------------------START | LOG IN-----------------------------#
+
 st.header("1. Enter Your Credential.", divider="rainbow")
 st.markdown(
     """<b><p style="font-size:22px">
@@ -93,8 +94,19 @@ if confirmedCredential:
             """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
             unsafe_allow_html=True,
         )
-
 # -------------------END | LOG IN-----------------------------#
+
+# -------------------START | SELECT INSTRUMENT-----------------------------#
+# -------------------END | SELECT INSTRUMENT-----------------------------#
+
+# -------------------START | SELECT PRICE CALCULATION-----------------------------#
+# -------------------END | SELECT PRICE CALCULATION-----------------------------#
+
+# -------------------START | SELECT STRATEGY-----------------------------#
+# -------------------END | SELECT STRATEGY-----------------------------#
+
+# -------------------START | MOVING AVERAGE KIND-----------------------------#
+# -------------------END | MOVING AVERAGE KIND-----------------------------#
 
 # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
 increase_value_of_slider = st.checkbox(
