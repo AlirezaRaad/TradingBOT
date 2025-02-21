@@ -52,86 +52,144 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
-# -------------------START | LOG IN-----------------------------#
 
-st.header("Enter Your Credential.", divider="rainbow")
-st.markdown(
-    """<b><p style="font-size:22px">
-    Enter you username/password and the server which you are connect with in mt5 app.</br>
-    <font color='orange'>YOU can find your credentials under Tools -> Options -> Server</font>
-    </p></b>
+st.header("Now Lets make our Bot", divider="rainbow")
+# Initialize session state for step tracking
+if "step" not in st.session_state:
+    st.session_state.step = 1  # Start at Step 1
 
-""",
-    unsafe_allow_html=True,
-)
-# Create 2 column to get Username/Password and 1 for Server
-usernameCol, passwordCol = st.columns(spec=2, vertical_alignment="center", gap="large")
 
-with usernameCol:
-    user_username = st.text_input(
-        "Enter your username:",
-        key="USER_username",
-        type="default",
+# Function to go forward
+def next_step():
+    st.session_state.step += 1
+
+
+# Function to go backward
+def prev_step():
+    st.session_state.step -= 1
+
+
+# Display different content based on the current step
+if st.session_state.step == 1:
+    # -------------------START | LOG IN-----------------------------#
+
+    st.header("Enter Your Credential.")
+    st.markdown(
+        """<b><p style="font-size:22px">
+        Enter you username/password and the server which you are connect with in mt5 app.</br>
+        <font color='orange'>YOU can find your credentials under Tools -> Options -> Server</font>
+        </p></b>
+
+    """,
+        unsafe_allow_html=True,
     )
-with passwordCol:
-    user_password = st.text_input(
-        "Enter your password:", key="USER_password", type="password"
+    # Create 2 column to get Username/Password and 1 for Server
+    usernameCol, passwordCol = st.columns(
+        spec=2, vertical_alignment="center", gap="large"
     )
 
-
-user_server = st.text_input("Enter your server:", key="USER_server", type="default")
-
-confirmedCredential = st.checkbox("Confirm and Lock Inputs")
-if confirmedCredential:
-    try:
-        tb = TradingBot(
-            username=int(user_username), password=user_password, server=user_server
+    with usernameCol:
+        user_username = st.text_input(
+            "Enter your username:",
+            key="USER_username",
+            type="default",
         )
-        tb.connect()
-        confirmedCredential
-    except:
-        st.markdown(
-            """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
-            unsafe_allow_html=True,
+    with passwordCol:
+        user_password = st.text_input(
+            "Enter your password:", key="USER_password", type="password"
         )
-# -------------------END | LOG IN-----------------------------#
 
-# -------------------START | SELECT INSTRUMENT-----------------------------#
-st.header("SELECT INSTRUMENT", divider="rainbow")
-st.selectbox(
-    "Pick a fruit:", ["Apple", "Banana", "Cherry"], index=1  # Default to "Banana"
-)
+    user_server = st.text_input("Enter your server:", key="USER_server", type="default")
+
+    confirmedCredential = st.checkbox("Confirm and Lock Inputs to see next Step.")
+    if confirmedCredential:
+        try:
+            st.session_state.tb = TradingBot(
+                username=int(user_username), password=user_password, server=user_server
+            )
+            st.session_state.tb.connect()
+
+            st.button("Next", on_click=next_step)
+
+        except:
+            st.markdown(
+                """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
+                unsafe_allow_html=True,
+            )
+
+    # -------------------END | LOG IN-----------------------------#
+
+elif st.session_state.step == 2:
+    # -------------------START | SELECT INSTRUMENT-----------------------------#
+    st.header("SELECT INSTRUMENT")
+
+    user_symbol = st.selectbox(
+        "Pick a INSTRUMENT:", list(st.session_state.tb.available_symbols)
+    )
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back", on_click=prev_step)
+    with col2:
+        st.button("Next", on_click=next_step)
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
-# -------------------START | SELECT PRICE CALCULATION-----------------------------#
-st.header("SELECT PRICE CALCULATION", divider="rainbow")
-# -------------------END | SELECT PRICE CALCULATION-----------------------------#
+elif st.session_state.step == 3:
+    # -------------------START | SELECT PRICE CALCULATION-----------------------------#
+    st.header("SELECT PRICE CALCULATION", divider="rainbow")
+    # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
-# -------------------START | SELECT STRATEGY-----------------------------#
-st.header("SELECT STRATEGY", divider="rainbow")
-# -------------------END | SELECT STRATEGY-----------------------------#
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back", on_click=prev_step)
+    with col2:
+        st.button("Next", on_click=next_step)
 
-# -------------------START | MOVING AVERAGE KIND-----------------------------#
-st.header("MOVING AVERAGE KIND", divider="rainbow")
-# -------------------END | MOVING AVERAGE KIND-----------------------------#
+elif st.session_state.step == 4:
+    # -------------------START | SELECT STRATEGY-----------------------------#
+    st.header("SELECT STRATEGY")
+    # -------------------END | SELECT STRATEGY-----------------------------#
 
-# -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
-st.header("SELECTING THE PERIODS", divider="rainbow")
-increase_value_of_slider = st.checkbox(
-    "Check Me if you want to increase max value of Shorter and Longer period to 99999"
-)
-spCol, lpCol = st.columns(2)  # Short Period, LongPeriod
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back", on_click=prev_step)
+    with col2:
+        st.button("Next", on_click=next_step)
 
-with spCol:
-    st.slider(
-        "Chose the shorter period For Moving Average",
-        min_value=1,
-        max_value=99999 if increase_value_of_slider else 50,
+elif st.session_state.step == 5:
+    # -------------------START | MOVING AVERAGE KIND-----------------------------#
+    st.header("MOVING AVERAGE KIND")
+    # -------------------END | MOVING AVERAGE KIND-----------------------------#
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back", on_click=prev_step)
+    with col2:
+        st.button("Next", on_click=next_step)
+
+elif st.session_state.step == 6:
+    # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+    st.header("SELECTING THE PERIODS")
+    increase_value_of_slider = st.checkbox(
+        "Check Me if you want to increase max value of Shorter and Longer period to 99999"
     )
-with lpCol:
-    st.slider(
-        "Chose the Longer period For Moving Average",
-        min_value=1,
-        max_value=99999 if increase_value_of_slider else 200,
-    )
-# -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+    spCol, lpCol = st.columns(2)  # Short Period, LongPeriod
+
+    with spCol:
+        st.slider(
+            "Chose the shorter period For Moving Average",
+            min_value=1,
+            max_value=99999 if increase_value_of_slider else 50,
+        )
+    with lpCol:
+        st.slider(
+            "Chose the Longer period For Moving Average",
+            min_value=1,
+            max_value=99999 if increase_value_of_slider else 200,
+        )
+    # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("Back", on_click=prev_step)
+    with col2:
+        st.button("Next", on_click=next_step)
