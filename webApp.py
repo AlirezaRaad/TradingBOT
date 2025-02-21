@@ -69,6 +69,8 @@ def prev_step():
     st.session_state.step -= 1
 
 
+allUserTypedData = dict()
+
 # Display different content based on the current step
 if st.session_state.step == 1:
     # -------------------START | LOG IN-----------------------------#
@@ -109,6 +111,12 @@ if st.session_state.step == 1:
             )
             st.session_state.tb.connect()
 
+            allUserTypedData["credentials"] = {
+                "username": user_username,
+                "password": user_password,
+                "server": user_server,
+            }
+
             st.button("Next", on_click=next_step)
 
         except:
@@ -116,7 +124,6 @@ if st.session_state.step == 1:
                 """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
                 unsafe_allow_html=True,
             )
-
 # -------------------END | LOG IN-----------------------------#
 
 elif st.session_state.step == 2:
@@ -127,11 +134,13 @@ elif st.session_state.step == 2:
         "Pick a INSTRUMENT:", list(st.session_state.tb.available_symbols)
     )
 
+    allUserTypedData["symbol"] = user_symbol
+
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Back", on_click=prev_step)
+        st.button("Previous Step", on_click=prev_step)
     with col2:
-        st.button("Next", on_click=next_step)
+        st.button("Next Step", on_click=next_step)
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
 elif st.session_state.step == 3:
@@ -156,11 +165,13 @@ elif st.session_state.step == 3:
         ),
     )
 
+    allUserTypedData["calc_meth":user_calc_method]
+
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Back", on_click=prev_step)
+        st.button("Previous Step", on_click=prev_step)
     with col2:
-        st.button("Next", on_click=next_step)
+        st.button("Next Step", on_click=next_step)
 # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
 elif st.session_state.step == 4:
@@ -181,19 +192,16 @@ elif st.session_state.step == 4:
         unsafe_allow_html=True,
     )
 
-    user_startegy = category
-    use_strategy_kind = sub_item
+    allUserTypedData["strategy"] = {"tool": category, "kind": sub_item}
 
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Back", on_click=prev_step)
+        st.button("Previous Step", on_click=prev_step)
     with col2:
-        st.button("Next", on_click=next_step)
+        st.button("Next Step", on_click=next_step)
 # -------------------END | SELECT STRATEGY-----------------------------#
 
-# -------------------END | MOVING AVERAGE KIND-----------------------------#
-
-elif st.session_state.step == 6:
+elif st.session_state.step == 5:
     # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
     st.header("SELECTING THE PERIODS")
     increase_value_of_slider = st.checkbox(
@@ -213,13 +221,11 @@ elif st.session_state.step == 6:
             min_value=1,
             max_value=99999 if increase_value_of_slider else 200,
         )
-
-    user_short_period = shorterPeriodBar
-    user_long_period = longererPeriodBar
+    allUserTypedData["periods"] = {"long": longererPeriodBar, "short": shorterPeriodBar}
 
     col1, col2 = st.columns(2)
     with col1:
-        st.button("Back", on_click=prev_step)
+        st.button("Previous Step", on_click=prev_step)
     with col2:
-        st.button("Next", on_click=next_step)
+        st.button("Next Step", on_click=next_step)
 # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
