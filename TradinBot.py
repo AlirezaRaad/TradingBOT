@@ -107,6 +107,8 @@ class TradingBot:
             "typical",
             "weighted",
         ] = "median ",
+        atrMultiplier: float = 1.5,
+        RR: float = 2.0,
     ):
         """
         timeFrame : MA Time Frame
@@ -117,10 +119,10 @@ class TradingBot:
         example:
         \tnShortCandle = 50 & nLongCandle = 200 & timeFrame 10 minutes -> bring 50 of most recent 10min bars data for shorter MA and bring 200 of most recent 10min bars for the longer MA.
         ------------------------
-        You Can Select You Short-Term and Long-term MA to trigger BUY/SELL orders.
+        atrMultiplier -> The number that will be multiplied by ATR in order to set sl/tp. (atrMultiplier * atr)
+        RR -> Risk/Reward ratio. Default Value is 2.0 which means (atrMultiplier * atr) * RR for the profits.
 
         ------------------------
-
         """
         from MovingAverage import MovingAverage
 
@@ -170,6 +172,11 @@ class TradingBot:
         shorter_ma.append(shorterMA())
         longer_ma.append(longerMA())
 
+        self.BuyOrder(
+            obj=longerMovingAverage,
+            symbol=symbol,
+        )
+
         while True:
             # Calculate new values
             new_shorter = shorterMA()
@@ -183,13 +190,23 @@ class TradingBot:
             if len(shorter_ma) == 2:
                 if shorter_ma[0] < longer_ma[0] and shorter_ma[1] > longer_ma[1]:
                     print("BUY signal detected!")
-                    self.BuyOrder(symbol)
+                    self.BuyOrder(
+                        obj=longerMovingAverage,
+                        symbol=symbol,
+                        atrMult=atrMultiplier,
+                        RR=RR,
+                    )
                     print("BUY Order Executed!")
 
                 # Check for Death Cross
                 elif shorter_ma[0] > longer_ma[0] and shorter_ma[1] < longer_ma[1]:
                     print("SELL signal detected!")
-                    self.SellOrder(symbol)
+                    self.SellOrder(
+                        obj=longerMovingAverage,
+                        symbol=symbol,
+                        atrMult=atrMultiplier,
+                        RR=RR,
+                    )
                     print("SELL Order Executed!")
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
@@ -205,14 +222,22 @@ class TradingBot:
         pass
 
     @staticmethod
-    def BuyOrder(
-        symbol,
-    ):
-        if len(mt5.positions_get()) == 0:
+    def BuyOrder(obj, symbol, atrMult: float = 1.5, RR: float = 2):
+        if len(mt5.positions_get()) != 0:
             # Dont Execute Action.
             return False
+
+        df = obj.data.copy()
+        df["high-low"] = df["high"] - df["low"]
+        df["high-close"] = np.abs(df["high"] - df["close"].shift(1))
+        df["low-close"] = np.abs(df["low"] - df["close"].shift(1))
+        df["tr"] = df[["high-low", "high-close", "low-close"]].max(axis=1)
+        atr = df["tr"].rolling(14).mean().iloc[-1]  # 14-period ATR
+
         price = mt5.symbol_info_tick(symbol).ask
-        point = mt5.symbol_info(symbol).point
+
+        sl = price - atrMult * atr
+        tp = price + atrMult * RR * atr
 
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
@@ -220,22 +245,32 @@ class TradingBot:
             "volume": 0.01,
             "type": mt5.ORDER_TYPE_BUY,
             "price": price,
-            "sl": price - 100 * point,
-            "tp": price + 200 * point,
+            "sl": sl,
+            "tp": tp,
             "comment": "python script BUY",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
-        mt5.order_send(request)
-        return True
+
+        return mt5.order_send(request)
 
     @staticmethod
-    def SellOrder(symbol):
-        if len(mt5.positions_get()) == 0:
+    def SellOrder(obj, symbol, atrMult: float = 1.5, RR: float = 2):
+        if len(mt5.positions_get()) != 0:
             # Dont Execute Action.
             return False
-        price = mt5.symbol_info_tick(symbol).ask
-        # point = mt5.symbol_info(symbol).point
+
+        price = mt5.symbol_info_tick(symbol).bid
+
+        df = obj.data.copy()
+        df["high-low"] = df["high"] - df["low"]
+        df["high-close"] = np.abs(df["high"] - df["close"].shift(1))
+        df["low-close"] = np.abs(df["low"] - df["close"].shift(1))
+        df["tr"] = df[["high-low", "high-close", "low-close"]].max(axis=1)
+        atr = df["tr"].rolling(14).mean().iloc[-1]  # 14-period ATR
+
+        sl = price + atrMult * atr
+        tp = price - atrMult * RR * atr
 
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
@@ -243,14 +278,14 @@ class TradingBot:
             "volume": 0.01,
             "type": mt5.ORDER_TYPE_SELL,
             "price": price,
-            "sl": price - 2,
-            "tp": price + 4,
+            "sl": sl,
+            "tp": tp,
             "comment": "python script SELL",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
-        mt5.order_send(request)
-        return True
+
+        return mt5.order_send(request)
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"
