@@ -54,7 +54,7 @@ st.markdown(
 )
 # -------------------START | LOG IN-----------------------------#
 
-st.header("1. Enter Your Credential.", divider="rainbow")
+st.header("Enter Your Credential.", divider="rainbow")
 st.markdown(
     """<b><p style="font-size:22px">
     Enter you username/password and the server which you are connect with in mt5 app.</br>
@@ -97,18 +97,26 @@ if confirmedCredential:
 # -------------------END | LOG IN-----------------------------#
 
 # -------------------START | SELECT INSTRUMENT-----------------------------#
+st.header("SELECT INSTRUMENT", divider="rainbow")
+st.selectbox(
+    "Pick a fruit:", ["Apple", "Banana", "Cherry"], index=1  # Default to "Banana"
+)
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
 # -------------------START | SELECT PRICE CALCULATION-----------------------------#
+st.header("SELECT PRICE CALCULATION", divider="rainbow")
 # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
 # -------------------START | SELECT STRATEGY-----------------------------#
+st.header("SELECT STRATEGY", divider="rainbow")
 # -------------------END | SELECT STRATEGY-----------------------------#
 
 # -------------------START | MOVING AVERAGE KIND-----------------------------#
+st.header("MOVING AVERAGE KIND", divider="rainbow")
 # -------------------END | MOVING AVERAGE KIND-----------------------------#
 
 # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+st.header("SELECTING THE PERIODS", divider="rainbow")
 increase_value_of_slider = st.checkbox(
     "Check Me if you want to increase max value of Shorter and Longer period to 99999"
 )
