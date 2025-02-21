@@ -179,20 +179,16 @@ class TradingBot:
             longer_ma.append(new_longer)
 
             # Check for Golden Cross
-            if (
-                len(shorter_ma) == 2
-                and shorter_ma[0] < longer_ma[0]
-                and shorter_ma[1] > longer_ma[1]
-            ):
-                print("BUY signal detected!")
 
-            # Check for Death Cross
-            elif (
-                len(shorter_ma) == 2
-                and shorter_ma[0] > longer_ma[0]
-                and shorter_ma[1] < longer_ma[1]
-            ):
-                print("SELL signal detected!")
+            if len(shorter_ma) == 2:
+                if shorter_ma[0] < longer_ma[0] and shorter_ma[1] > longer_ma[1]:
+                    print("BUY signal detected!")
+                    self.BuyOrder()
+
+                # Check for Death Cross
+                elif shorter_ma[0] > longer_ma[0] and shorter_ma[1] < longer_ma[1]:
+                    print("SELL signal detected!")
+                    self.SellOrder()
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
@@ -206,11 +202,53 @@ class TradingBot:
     def BackupTheData():
         pass
 
-    def BuyOrder():
-        pass
+    @staticmethod
+    def BuyOrder(
+        symbol,
+    ):
+        if len(mt5.positions_get()) == 0:
+            # Dont Execute Action.
+            return False
+        price = mt5.symbol_info_tick(symbol).ask
+        point = mt5.symbol_info(symbol).point
 
-    def SellOrder():
-        pass
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": 0.01,
+            "type": mt5.ORDER_TYPE_BUY,
+            "price": price,
+            "sl": price - 100 * point,
+            "tp": price + 200 * point,
+            "comment": "python script BUY",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+        mt5.order_send(request)
+        return True
+
+    @staticmethod
+    def SellOrder(symbol):
+        if len(mt5.positions_get()) == 0:
+            # Dont Execute Action.
+            return False
+        price = mt5.symbol_info_tick(symbol).ask
+        point = mt5.symbol_info(symbol).point
+
+        request = {
+            "action": mt5.TRADE_ACTION_DEAL,
+            "symbol": symbol,
+            "volume": 0.01,
+            "type": mt5.ORDER_TYPE_SELL,
+            "price": price,
+            "sl": price - 100 * point,
+            "tp": price + 200 * point,
+            "comment": "python script SELL",
+            "type_time": mt5.ORDER_TIME_GTC,
+            "type_filling": mt5.ORDER_FILLING_IOC,
+        }
+        mt5.order_send(request)
+        return True
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"

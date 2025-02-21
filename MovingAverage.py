@@ -119,18 +119,19 @@ class MovingAverage:
     def GetData(self):
         df = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self._sym_bol_, self.alltimeframes()[self.timeframe], 0, self.period
+                self._sym_bol_, self.alltimeframes()[self.timeframe], 0, self.period + 1
             )
         )
+
+        if df.empty:
+            raise ValueError("DataFrames are empty!")
+
         df["time"] = pd.to_datetime(df["time"], unit="s", utc=True)
         df.index = df["time"]
         df.drop(columns=["time", "real_volume"], inplace=True)
         df.index.rename("time", inplace=True)
 
-        if df.empty:
-            return ValueError("DataFrames are empty!")
-
-        self.data = df
+        self.data = df[:-1]
 
     def Calculate(self):
         """
