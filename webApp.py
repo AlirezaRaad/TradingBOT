@@ -56,7 +56,10 @@ st.markdown(
 st.header("Now Lets make our Bot", divider="rainbow")
 # Initialize session state for step tracking
 if "step" not in st.session_state:
-    st.session_state.step = 1  # Start at Step 1
+    st.session_state.step = 1
+
+if "changed_flag" not in st.session_state:
+    st.session_state.changed_flag = None
 
 
 # Function to go forward
@@ -69,12 +72,18 @@ def prev_step():
     st.session_state.step -= 1
 
 
-allUserTypedData = dict()
+def confirm_change():
+    st.session_state.update(step=6)
+    st.session_state.changed_flag = False
+
+
+if "allUserTypedData" not in st.session_state:
+    st.session_state.allUserTypedData = {}
+
 
 # Display different content based on the current step
 if st.session_state.step == 1:
     # -------------------START | LOG IN-----------------------------#
-
     st.header("Enter Your Credential.")
     st.markdown(
         """<b><p style="font-size:22px">
@@ -111,7 +120,7 @@ if st.session_state.step == 1:
             )
             st.session_state.tb.connect()
 
-            allUserTypedData["credentials"] = {
+            st.session_state.allUserTypedData["credentials"] = {
                 "username": user_username,
                 "password": user_password,
                 "server": user_server,
@@ -134,21 +143,22 @@ elif st.session_state.step == 2:
         "Pick a INSTRUMENT:", list(st.session_state.tb.available_symbols)
     )
 
-    allUserTypedData["symbol"] = user_symbol
+    st.session_state.allUserTypedData["symbol"] = user_symbol
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Previous Step", on_click=prev_step)
     with col2:
         st.button("Next Step", on_click=next_step)
+
+    if st.session_state.changed_flag is True:
+        st.button("Confirm Change", on_click=confirm_change)
+
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
 elif st.session_state.step == 3:
     # -------------------START | SELECT PRICE CALCULATION-----------------------------#
-    st.header(
-        "SELECT HOW YOU WANT TO CALCULATE PRICE THAT WITH USE IN MOVING AVERAGES",
-        divider="rainbow",
-    )
+    st.header("SELECT HOW YOU WANT TO CALCULATE PRICE THAT WITH USE IN MOVING AVERAGES")
 
     user_calc_method = st.selectbox(
         "Pick a INSTRUMENT:",
@@ -165,18 +175,21 @@ elif st.session_state.step == 3:
         ),
     )
 
-    allUserTypedData["calc_meth":user_calc_method]
+    st.session_state.allUserTypedData["calc_meth"] = user_calc_method
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Previous Step", on_click=prev_step)
     with col2:
         st.button("Next Step", on_click=next_step)
+    if st.session_state.changed_flag is True:
+        st.button("Confirm Change", on_click=confirm_change)
 # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
 elif st.session_state.step == 4:
     # -------------------START | SELECT STRATEGY-----------------------------#
     st.header("SELECT STRATEGY AND ITS KIND")
+
     options = {"MA CrossOvers": ["SMA", "EMA", "WMA", "VWMA"]}
 
     # First dropdown: Select Strategy
@@ -192,13 +205,16 @@ elif st.session_state.step == 4:
         unsafe_allow_html=True,
     )
 
-    allUserTypedData["strategy"] = {"tool": category, "kind": sub_item}
+    st.session_state.allUserTypedData["strategy"] = {"tool": category, "kind": sub_item}
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Previous Step", on_click=prev_step)
     with col2:
         st.button("Next Step", on_click=next_step)
+
+    if st.session_state.changed_flag is True:
+        st.button("Confirm Change", on_click=confirm_change)
 # -------------------END | SELECT STRATEGY-----------------------------#
 
 elif st.session_state.step == 5:
@@ -221,11 +237,97 @@ elif st.session_state.step == 5:
             min_value=1,
             max_value=99999 if increase_value_of_slider else 200,
         )
-    allUserTypedData["periods"] = {"long": longererPeriodBar, "short": shorterPeriodBar}
+    st.session_state.allUserTypedData["periods"] = {
+        "long": longererPeriodBar,
+        "short": shorterPeriodBar,
+    }
 
     col1, col2 = st.columns(2)
     with col1:
         st.button("Previous Step", on_click=prev_step)
     with col2:
         st.button("Next Step", on_click=next_step)
+
+    if st.session_state.changed_flag is True:
+        st.button("Confirm Change", on_click=confirm_change)
 # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
+
+elif st.session_state.step == 6:
+    st.header("Confirmation")
+    st.markdown(
+        f"""{st.session_state.allUserTypedData}""",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"""<b><p style="font-size:22px">
+    1. Instrument : {st.session_state.allUserTypedData["symbol"]}</br>
+    2. Price Calculation method : {st.session_state.allUserTypedData["calc_meth"]}</br>
+    3. Strategy : {st.session_state.allUserTypedData['strategy']["tool"]} with {st.session_state.allUserTypedData['strategy']["kind"]}</br>
+    4. Periods : Short = {st.session_state.allUserTypedData["periods"]["short"]}, Long = {st.session_state.allUserTypedData["periods"]["long"]}</br></p></b>""",
+        unsafe_allow_html=True,
+    )
+
+    # Initialize session state for checkboxes
+    if "yes_checked" not in st.session_state:
+        st.session_state.yes_checked = False
+
+    if "no_checked" not in st.session_state:
+        st.session_state.no_checked = False
+
+    # Function to update checkbox state
+    def update_yes():
+        st.session_state.yes_checked = not st.session_state.yes_checked
+        if st.session_state.yes_checked:
+            st.session_state.no_checked = False  # Uncheck "No"
+
+    def update_no():
+        st.session_state.no_checked = not st.session_state.no_checked
+        if st.session_state.no_checked:
+            st.session_state.yes_checked = False  # Uncheck "Yes"
+
+    UserLastQuestion = (
+        "Yes"
+        if st.session_state.yes_checked
+        else "No" if st.session_state.no_checked else "None"
+    )
+    st.markdown(
+        f"""<font color='hotpink'><b><p style="font-size:22px">Do you want to proceed and Run the bot with your information or you want to change things? </p></b></font>""",
+        unsafe_allow_html=True,
+    )
+
+    # Create mutually exclusive checkboxes
+    yes = st.checkbox("Yes", value=st.session_state.yes_checked, on_change=update_yes)
+    no = st.checkbox("No", value=st.session_state.no_checked, on_change=update_no)
+
+    if UserLastQuestion == "Yes":
+        st.markdown(
+            f"""{st.session_state.allUserTypedData}""",
+            unsafe_allow_html=True,
+        )
+
+    elif UserLastQuestion == "No":
+        st.markdown(
+            f"""<b><p style="font-size:22px">Do you want to proceed and Run the bot with your information or you want to change things? </p></b>""",
+            unsafe_allow_html=True,
+        )
+        allTheStepsdict = {
+            "Selecting INSTRUMENT": 2,
+            "Selecting how to CALCULATE PRICE": 3,
+            "Selecting STRATEGY and its KIND": 4,
+            "Selecting the PERIODS": 5,
+        }
+
+        st.markdown(
+            f"""<font color='crismon'><b><p style="font-size:22px">Select a step to return to :</p></b></font>""",
+            unsafe_allow_html=True,
+        )
+        user_step_to_return = st.selectbox("", options=list(allTheStepsdict.keys()))
+
+        st.markdown(
+            f"""<font color='crismon'><b><p style="font-size:22px">Click button bellow to go to your desired step.</p></b></font>""",
+            unsafe_allow_html=True,
+        )
+        if st.button("Click"):
+            st.session_state.step = allTheStepsdict[user_step_to_return]
+
+            st.session_state.changed_flag = True
