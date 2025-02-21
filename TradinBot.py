@@ -34,12 +34,24 @@ class TradingBot:
 
     """
 
+    available_symbols = set()
+
     def __init__(self, username, password, server):
         self._user_name_ = username
         self._pass_word_ = password
         self._ser_ver_ = server
         if not self.connect():
             raise ValueError("Enter Correct Credentials")
+        TradingBot.FetchAllAvailableSymbols()
+
+    @classmethod
+    def FetchAllAvailableSymbols(cls):
+        """
+        Fetch All symbols that the brokers has and pour the name of them into TradingBot.available_symbols
+        """
+        symbols = mt5.symbols_get()
+        for i in range(len(symbols)):
+            cls.available_symbols.add(symbols[i].name)
 
     @property
     def username(self):
@@ -128,7 +140,8 @@ class TradingBot:
 
         if kind not in MovingAverage.AllMAs():
             raise TypeError("Please Provide The CORRECT MA METHOD.")
-
+        if symbol not in TradingBot.FetchAllAvailableSymbols():
+            raise TypeError("Please Provide The SYMBOL That your Broker has.")
         # Creating Shorter MovingAverage Class with its correct MA method.
         shorterMovingAverage = MovingAverage(
             kind=kind,
