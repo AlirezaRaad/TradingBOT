@@ -183,12 +183,14 @@ class TradingBot:
             if len(shorter_ma) == 2:
                 if shorter_ma[0] < longer_ma[0] and shorter_ma[1] > longer_ma[1]:
                     print("BUY signal detected!")
-                    self.BuyOrder()
+                    self.BuyOrder(symbol)
+                    print("BUY Order Executed!")
 
                 # Check for Death Cross
                 elif shorter_ma[0] > longer_ma[0] and shorter_ma[1] < longer_ma[1]:
                     print("SELL signal detected!")
-                    self.SellOrder()
+                    self.SellOrder(symbol)
+                    print("SELL Order Executed!")
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
@@ -233,7 +235,7 @@ class TradingBot:
             # Dont Execute Action.
             return False
         price = mt5.symbol_info_tick(symbol).ask
-        point = mt5.symbol_info(symbol).point
+        # point = mt5.symbol_info(symbol).point
 
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
@@ -241,8 +243,8 @@ class TradingBot:
             "volume": 0.01,
             "type": mt5.ORDER_TYPE_SELL,
             "price": price,
-            "sl": price - 100 * point,
-            "tp": price + 200 * point,
+            "sl": price - 2,
+            "tp": price + 4,
             "comment": "python script SELL",
             "type_time": mt5.ORDER_TIME_GTC,
             "type_filling": mt5.ORDER_FILLING_IOC,
