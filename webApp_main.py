@@ -1,6 +1,7 @@
 import streamlit as st
 from WebApp_Home import Home as web_home
 from WebApp_AboutStrategies import AboutStrat
+from WebApp_BOT import TheBot
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:
@@ -35,7 +36,7 @@ def Telegram_Connection():
 
 
 def RunTheBot():
-    pass
+    TheBot()
 
 
 # -------------------END | CREATING SIDEBAR-------------------#
