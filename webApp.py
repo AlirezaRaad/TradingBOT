@@ -54,6 +54,7 @@ st.markdown(
 )
 
 st.header("Now Lets make our Bot", divider="rainbow")
+
 # Initialize session state for step tracking
 if "step" not in st.session_state:
     st.session_state.step = 1
@@ -61,6 +62,19 @@ if "step" not in st.session_state:
 
 if "changed_flag" not in st.session_state:
     st.session_state.changed_flag = None
+
+if "start_trading" not in st.session_state:
+    st.session_state.start_trading = False  # Controls whether to start the bot or no.
+
+if "allUserTypedData" not in st.session_state:
+    st.session_state.allUserTypedData = {}
+    # Makes a Dictionary to store information of user to give to the bot
+
+if "lock_inputs" not in st.session_state:
+    st.session_state.lock_inputs = False
+    # Controls whether inputs are locked or not. Further I only add the changes to allUserTypedData dict if only this is false.
+    # I used not statement to make it True and then add to the dict. If this get true no other changes can happen to the dict.
+    # Maybe User can change something but in the backend It wont change.
 
 
 # Function to go forward
@@ -74,18 +88,11 @@ def prev_step():
 
 
 def confirm_change():
+    """
+    In step 6 I implement a way to go to the desire step and change the info. This function will return the user back to step 6.
+    """
     st.session_state.update(step=6)
     st.session_state.changed_flag = False
-
-
-if "start_trading" not in st.session_state:
-    st.session_state.start_trading = False  # Controls whether inputs are locked
-
-if "allUserTypedData" not in st.session_state:
-    st.session_state.allUserTypedData = {}
-
-if "lock_inputs" not in st.session_state:
-    st.session_state.lock_inputs = False  # Controls whether inputs are locked
 
 
 def confirm_and_lock():
@@ -108,7 +115,8 @@ if st.session_state.step == 1:
     """,
         unsafe_allow_html=True,
     )
-    # Create 2 column to get Username/Password and 1 for Server
+
+    # Create 2 column to get Username/Password and 1 for Server in a separate boc
     usernameCol, passwordCol = st.columns(
         spec=2, vertical_alignment="center", gap="large"
     )
@@ -136,6 +144,8 @@ if st.session_state.step == 1:
     )
 
     confirmedCredential = st.checkbox("Confirm and Lock Inputs to see next Step.")
+
+    # If the program was able to login to mt5 using the credentials, it will go to the next step.
     if confirmedCredential:
         try:
             st.session_state.tb = TradingBot(
@@ -172,6 +182,7 @@ elif st.session_state.step == 2:
         disabled=st.session_state.lock_inputs,
     )
 
+    # if lock_input is False, add the symbol to the dict.
     if not st.session_state.lock_inputs:
         st.session_state.allUserTypedData["symbol"] = user_symbol
 
@@ -183,6 +194,8 @@ elif st.session_state.step == 2:
 
     if st.session_state.changed_flag is True:
         st.button("Confirm Change", on_click=confirm_change)
+        # this button only shows itself when in the last step user comes to this step.
+
 
 # -------------------END | SELECT INSTRUMENT-----------------------------#
 
@@ -206,7 +219,10 @@ elif st.session_state.step == 3:
         ),
         disabled=st.session_state.lock_inputs,
     )
+    # disabled=st.session_state.lock_inputs=False in the first implementation, but if lock_inputs get True Value in step 6,
+    # you cannot change this.
 
+    # if lock_input is False, add the calculation method to the dict.
     if not st.session_state.lock_inputs:
         st.session_state.allUserTypedData["calc_meth"] = user_calc_method
 
@@ -217,6 +233,7 @@ elif st.session_state.step == 3:
         st.button("Next Step", on_click=next_step)
     if st.session_state.changed_flag is True:
         st.button("Confirm Change", on_click=confirm_change)
+        # this button only shows itself when in the last step user comes to this step.
 # -------------------END | SELECT PRICE CALCULATION-----------------------------#
 
 # -------------------START | SELECT STRATEGY-----------------------------#
@@ -247,6 +264,7 @@ elif st.session_state.step == 4:
         unsafe_allow_html=True,
     )
 
+    # if lock_input is False, add the strategy and kind to the dict.
     if not st.session_state.lock_inputs:
         st.session_state.allUserTypedData["strategy"] = {
             "tool": category,
@@ -261,6 +279,7 @@ elif st.session_state.step == 4:
 
     if st.session_state.changed_flag is True:
         st.button("Confirm Change", on_click=confirm_change)
+        # this button only shows itself when in the last step user comes to this step.
 # -------------------END | SELECT STRATEGY-----------------------------#
 
 # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
@@ -282,11 +301,12 @@ elif st.session_state.step == 5:
     with lpCol:
         longererPeriodBar = st.slider(
             "Chose the Longer period For Moving Average",
-            min_value=1,
+            min_value=shorterPeriodBar + 1,
             max_value=99999 if increase_value_of_slider else 200,
             disabled=st.session_state.lock_inputs,
         )
 
+    # if lock_input is False, add the shorter and longer period to the dict.
     if not st.session_state.lock_inputs:
         st.session_state.allUserTypedData["periods"] = {
             "long": longererPeriodBar,
@@ -301,10 +321,14 @@ elif st.session_state.step == 5:
 
     if st.session_state.changed_flag is True:
         st.button("Confirm Change", on_click=confirm_change)
+        # this button only shows itself when in the last step user comes to this step.
+
 # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
 
 elif st.session_state.step == 6:
+
     st.header("Confirmation")
+
     st.markdown(
         f"""<b><p style="font-size:22px">
     1. Instrument : {st.session_state.allUserTypedData["symbol"]}</br>
@@ -317,7 +341,6 @@ elif st.session_state.step == 6:
     # Initialize session state for checkboxes
     if "yes_checked" not in st.session_state:
         st.session_state.yes_checked = False
-
     if "no_checked" not in st.session_state:
         st.session_state.no_checked = False
 
@@ -332,29 +355,33 @@ elif st.session_state.step == 6:
         if st.session_state.no_checked:
             st.session_state.yes_checked = False  # Uncheck "Yes"
 
+    # UserLastQuestion : Keeps Track on What checkbox user ticked.
     UserLastQuestion = (
         "Yes"
         if st.session_state.yes_checked
         else "No" if st.session_state.no_checked else "None"
     )
+
     st.markdown(
         f"""<font color='hotpink'><b><p style="font-size:22px">Do you want to proceed and Run the bot with your information or you want to change things? </p></b></font>""",
         unsafe_allow_html=True,
     )
 
-    # Create mutually exclusive checkboxes
+    # Create yes/no checkboxes.
     yes = st.checkbox("Yes", value=st.session_state.yes_checked, on_change=update_yes)
     no = st.checkbox("No", value=st.session_state.no_checked, on_change=update_no)
 
     if UserLastQuestion == "Yes":
-        confirm_and_lock()  # Refresh the app to immediately disable inputs
-        st.session_state.start_trading = True
+        confirm_and_lock()  # immediately disable inputs
+        st.session_state.start_trading = True  # start the robot process.
 
     elif UserLastQuestion == "No":
+
         st.markdown(
             f"""<b><p style="font-size:22px">Do you want to proceed and Run the bot with your information or you want to change things? </p></b>""",
             unsafe_allow_html=True,
         )
+
         allTheStepsdict = {
             "Selecting INSTRUMENT": 2,
             "Selecting how to CALCULATE PRICE": 3,
@@ -377,10 +404,10 @@ elif st.session_state.step == 6:
             st.session_state.step = allTheStepsdict[user_step_to_return]
 
             st.session_state.changed_flag = True
+            # Gets User Back to desired step.
 
-
-st.session_state.start_trading = True
 if st.session_state.start_trading:
+
     st.header("Running The Bot", divider="rainbow")
 
     st.session_state.allUserTypedData
