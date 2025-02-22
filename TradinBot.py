@@ -69,6 +69,8 @@ class TradingBot:
         for i in range(len(symbols)):
             cls.available_symbols.add(symbols[i].name)
 
+        return symbols
+
     @property
     def username(self):
         return self._user_name_
