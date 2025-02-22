@@ -352,5 +352,12 @@ class TradingBot:
         conn_buy_sell.commit()
         return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
+    @staticmethod
+    def AllPlacedOrders() -> pd.DataFrame:
+        """
+        returns a pandas DataFrame of all placed Orders Using This Bot.
+        """
+        return pd.read_sql("SELECT * FROM orders", conn_buy_sell)
+
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"

@@ -1,5 +1,9 @@
 import streamlit as st
+import sqlite3 as sql
 from TradinBot import TradingBot
+
+conn_buy_sell = sql.connect("BuySellHistory.db")
+bs_cursor = conn_buy_sell.cursor()
 
 st.header("Raad Algoritmic TradingBot", divider="rainbow")
 
@@ -459,3 +463,7 @@ if st.session_state.start_trading:
                 f"""<b><p style="font-size:25px">Bot is running!!""",
                 unsafe_allow_html=True,
             )
+
+            st.header("All Orders That made by this BOT", divider="rainbow")
+            df = st.session_state.tb.AllPlacedOrders()
+            st.dataframe(df)
