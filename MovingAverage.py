@@ -113,8 +113,9 @@ class MovingAverage:
             "weighted",
         }
 
+    @staticmethod
     def AllMAs():
-        return ("SMA", "EMA", "WMA", "VWMA")
+        return {"SMA", "EMA", "WMA", "VWMA"}
 
     def GetData(self):
         df = pd.DataFrame(

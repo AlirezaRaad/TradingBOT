@@ -104,7 +104,7 @@ class TradingBot:
         symbol,
         nShortCandle: int,
         nLongCandle: int,
-        kind: Literal["SMA", "EMA", "VWMA", "WMA"],
+        kind: Literal["SMA", "EMA", "WMA", "VWMA"],
         timeFrame: Literal[
             "1 minute",
             "2 minutes",
