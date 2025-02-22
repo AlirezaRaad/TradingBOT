@@ -410,21 +410,52 @@ if st.session_state.start_trading:
 
     st.header("Running The Bot", divider="rainbow")
 
-    st.session_state.allUserTypedData
-
+    # Instantiate The bot to start Trading.
     if st.session_state.allUserTypedData["strategy"]["tool"] == "MA CrossOvers":
-        st.session_state.tb.MovingAverage(
-            symbol=st.session_state.allUserTypedData["symbol"],
-            nLongCandle=st.session_state.allUserTypedData["period"]["long"],
-            nShortCandle=st.session_state.allUserTypedData["period"]["short"],
-            timeFrame="1 minute",
-            kind=["strategy"]["kind"],
-            applyWhere=st.session_state.allUserTypedData["calc_meth"],
-            atrMultiplier=1.5,
-            RR=2,
+
+        if "bot_input" not in st.session_state:
+            st.session_state.bot_input = False
+        # For locking the timeFrame/atrMultiplier/RR if user clicked a button.
+
+        # Ask User For the DesireTime Frame.
+        from MovingAverage import MovingAverage as mv
+
+        timeFrames = mv.alltimeframes()
+
+        user_time_frame = st.selectbox(
+            "Select Your TimeFrame:",
+            timeFrames,
+            disabled=st.session_state.bot_input,
         )
 
-    st.markdown(
-        f"""<b><p style="font-size:25px">Bot is running!!""",
-        unsafe_allow_html=True,
-    )
+        col_atr, col_rr = st.columns(2)
+
+        with col_atr:
+            user_atr = st.text_input(
+                "Enter your ATR multiplier for the stop loss (eg: 1.5atr) :",
+                disabled=st.session_state.bot_input,
+            )
+        with col_rr:
+            user_rr = st.text_input(
+                "Enter your R/R (eg: 2 -> 2 * selected ATR for Take profit) :",
+                disabled=st.session_state.bot_input,
+            )
+
+        if st.checkbox("Confirm and Start The Bot"):
+            st.session_state.bot_input = True
+
+        st.session_state.tb.MovingAverage(
+            symbol=st.session_state.allUserTypedData["symbol"],
+            nLongCandle=st.session_state.allUserTypedData["periods"]["long"],
+            nShortCandle=st.session_state.allUserTypedData["periods"]["short"],
+            timeFrame=user_time_frame,
+            kind=st.session_state.allUserTypedData["strategy"]["kind"],
+            applyWhere=st.session_state.allUserTypedData["calc_meth"],
+            atrMultiplier=user_atr,
+            RR=user_rr,
+        )
+
+        st.markdown(
+            f"""<b><p style="font-size:25px">Bot is running!!""",
+            unsafe_allow_html=True,
+        )

@@ -2,9 +2,24 @@ import MetaTrader5 as mt5
 import pandas as pd
 import numpy as np
 import datetime as dt
+import sqlite3 as sql
 from typing import Optional, Literal
 from types import SimpleNamespace
 from collections import deque
+
+conn_buy_sell = sql.connect("BuySellHistory.db")
+bs_cursor = conn_buy_sell.cursor()
+bs_cursor.execute(
+    """CREATE TABLE IF NOT EXISTS orders (
+                  Time nvarchar(26) PRIMARY KEY,
+                  Symbol nvarchar(10),
+                  Price float,
+                  SL float,
+                  TP float,
+                  Volume float,
+                  Type char(4))
+"""
+)
 
 
 # TODO: DONT FORGET TO ADD SQL DATABASE.
@@ -257,10 +272,6 @@ class TradingBot:
 
     @staticmethod
     def BuyOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
-        if len(mt5.positions_get()) != 0:
-            # Dont Execute Action.
-            return False
-
         price = mt5.symbol_info_tick(symbol).ask
 
         atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow)
@@ -281,13 +292,16 @@ class TradingBot:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        return mt5.order_send(request)
+        mt5.order_send(request)
+        bs_cursor(
+            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type)
+                  VALUES (?,?,?,?,?,?)""",
+            (str(dt.datetime.now()), symbol, price, tp, sl, 0.01, "BUY"),
+        )
+        return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())}"
 
     @staticmethod
     def SellOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
-        if len(mt5.positions_get()) != 0:
-            # Dont Execute Action.
-            return False
 
         price = mt5.symbol_info_tick(symbol).bid
 
@@ -309,7 +323,13 @@ class TradingBot:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        return mt5.order_send(request)
+        mt5.order_send(request)
+        bs_cursor(
+            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type)
+                  VALUES (?,?,?,?,?,?)""",
+            (str(dt.datetime.now()), symbol, price, tp, sl, 0.01, "SELL"),
+        )
+        return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())}"
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"
