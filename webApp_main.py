@@ -1,6 +1,5 @@
 import streamlit as st
-
-st.header("Raad Algoritmic TradingBot", divider="rainbow")
+from WebApp_Home import Home as web_home
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:
@@ -23,7 +22,7 @@ with st.sidebar:
 
 # Define different pages
 def Home():
-    pass
+    web_home()
 
 
 def About_Strategies():
