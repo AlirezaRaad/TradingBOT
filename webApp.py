@@ -182,7 +182,8 @@ elif st.session_state.step == 2:
 
     user_symbol = st.selectbox(
         "Pick a INSTRUMENT:",
-        list(st.session_state.tb.available_symbols),
+        list(sorted(st.session_state.tb.available_symbols)),
+        index=list(sorted(st.session_state.tb.available_symbols)).index("EURUSD"),
         disabled=st.session_state.lock_inputs,
     )
 
