@@ -246,7 +246,7 @@ elif st.session_state.step == 4:
 
     st.header("SELECT STRATEGY AND ITS KIND")
 
-    options = {"MA CrossOvers": ["SMA", "EMA", "WMA", "VWMA"]}
+    options = {"MA Models": ["SMA", "EMA", "WMA", "VWMA"]}
 
     # First dropdown: Select Strategy
     category = st.selectbox(
@@ -416,7 +416,7 @@ if st.session_state.start_trading:
     st.header("Running The Bot", divider="rainbow")
 
     # Instantiate The bot to start Trading.
-    if st.session_state.allUserTypedData["strategy"]["tool"] == "MA CrossOvers":
+    if st.session_state.allUserTypedData["strategy"]["tool"] == "MA Models":
 
         if "bot_input" not in st.session_state:
             st.session_state.bot_input = False
