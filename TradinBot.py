@@ -17,7 +17,8 @@ bs_cursor.execute(
                   SL float,
                   TP float,
                   Volume float,
-                  Type char(4))
+                  Type char(4),
+                  Strategy nvarchar(50))
 """
 )
 
@@ -294,11 +295,20 @@ class TradingBot:
 
         mt5.order_send(request)
         bs_cursor(
-            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type)
-                  VALUES (?,?,?,?,?,?)""",
-            (str(dt.datetime.now()), symbol, price, tp, sl, 0.01, "BUY"),
+            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
+                  VALUES (?,?,?,?,?,?,?,?)""",
+            (
+                str(dt.datetime.now()),
+                symbol,
+                price,
+                tp,
+                sl,
+                0.01,
+                "BUY",
+                "MA CrossOver",
+            ),
         )
-        return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())}"
+        return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     @staticmethod
     def SellOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
@@ -325,11 +335,20 @@ class TradingBot:
 
         mt5.order_send(request)
         bs_cursor(
-            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type)
-                  VALUES (?,?,?,?,?,?)""",
-            (str(dt.datetime.now()), symbol, price, tp, sl, 0.01, "SELL"),
+            f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
+                  VALUES (?,?,?,?,?,?,?,?)""",
+            (
+                str(dt.datetime.now()),
+                symbol,
+                price,
+                tp,
+                sl,
+                0.01,
+                "SELL",
+                "MA CrossOver",
+            ),
         )
-        return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())}"
+        return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"

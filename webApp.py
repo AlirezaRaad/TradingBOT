@@ -444,18 +444,18 @@ if st.session_state.start_trading:
         if st.checkbox("Confirm and Start The Bot"):
             st.session_state.bot_input = True
 
-        st.session_state.tb.MovingAverage(
-            symbol=st.session_state.allUserTypedData["symbol"],
-            nLongCandle=st.session_state.allUserTypedData["periods"]["long"],
-            nShortCandle=st.session_state.allUserTypedData["periods"]["short"],
-            timeFrame=user_time_frame,
-            kind=st.session_state.allUserTypedData["strategy"]["kind"],
-            applyWhere=st.session_state.allUserTypedData["calc_meth"],
-            atrMultiplier=user_atr,
-            RR=user_rr,
-        )
+            st.session_state.tb.MovingAverage(
+                symbol=st.session_state.allUserTypedData["symbol"],
+                nLongCandle=st.session_state.allUserTypedData["periods"]["long"],
+                nShortCandle=st.session_state.allUserTypedData["periods"]["short"],
+                timeFrame=user_time_frame,
+                kind=st.session_state.allUserTypedData["strategy"]["kind"],
+                applyWhere=st.session_state.allUserTypedData["calc_meth"],
+                atrMultiplier=user_atr,
+                RR=user_rr,
+            )
 
-        st.markdown(
-            f"""<b><p style="font-size:25px">Bot is running!!""",
-            unsafe_allow_html=True,
-        )
+            st.markdown(
+                f"""<b><p style="font-size:25px">Bot is running!!""",
+                unsafe_allow_html=True,
+            )
