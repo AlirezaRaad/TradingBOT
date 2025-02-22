@@ -43,7 +43,7 @@ def TheBot():
         """
         In step 6 I implement a way to go to the desire step and change the info. This function will return the user back to step 6.
         """
-        st.session_state.update(step=6)
+        st.session_state.update(step=4)
         st.session_state.changed_flag = False
 
     def confirm_and_lock():
@@ -149,47 +149,8 @@ def TheBot():
 
     # -------------------END | SELECT INSTRUMENT-----------------------------#
 
-    # -------------------START | SELECT PRICE CALCULATION-----------------------------#
-    elif st.session_state.step == 3:
-
-        st.header(
-            "SELECT HOW YOU WANT TO CALCULATE PRICE THAT WITH USE IN MOVING AVERAGES"
-        )
-
-        user_calc_method = st.selectbox(
-            "Pick a INSTRUMENT:",
-            list(
-                {
-                    "close",
-                    "open",
-                    "high",
-                    "low",
-                    "median",
-                    "typical",
-                    "weighted",
-                }
-            ),
-            disabled=st.session_state.lock_inputs,
-        )
-        # disabled=st.session_state.lock_inputs=False in the first implementation, but if lock_inputs get True Value in step 6,
-        # you cannot change this.
-
-        # if lock_input is False, add the calculation method to the dict.
-        if not st.session_state.lock_inputs:
-            st.session_state.allUserTypedData["calc_meth"] = user_calc_method
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.button("Previous Step", on_click=prev_step)
-        with col2:
-            st.button("Next Step", on_click=next_step)
-        if st.session_state.changed_flag is True:
-            st.button("Confirm Change", on_click=confirm_change)
-            # this button only shows itself when in the last step user comes to this step.
-    # -------------------END | SELECT PRICE CALCULATION-----------------------------#
-
     # -------------------START | SELECT STRATEGY-----------------------------#
-    elif st.session_state.step == 4:
+    elif st.session_state.step == 3:
 
         st.header("SELECT STRATEGY AND ITS KIND")
 
@@ -234,59 +195,15 @@ def TheBot():
             # this button only shows itself when in the last step user comes to this step.
     # -------------------END | SELECT STRATEGY-----------------------------#
 
-    # -------------------START | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
-    elif st.session_state.step == 5:
-
-        st.header("SELECTING THE PERIODS")
-        increase_value_of_slider = st.checkbox(
-            "Check Me if you want to increase max value of Shorter and Longer period to 99999"
-        )
-        spCol, lpCol = st.columns(2)  # Short Period, LongPeriod
-
-        with spCol:
-            shorterPeriodBar = st.slider(
-                "Chose the shorter period For Moving Average",
-                min_value=1,
-                max_value=99999 if increase_value_of_slider else 50,
-                disabled=st.session_state.lock_inputs,
-            )
-        with lpCol:
-            longererPeriodBar = st.slider(
-                "Chose the Longer period For Moving Average",
-                min_value=shorterPeriodBar + 1,
-                max_value=99999 if increase_value_of_slider else 200,
-                disabled=st.session_state.lock_inputs,
-            )
-
-        # if lock_input is False, add the shorter and longer period to the dict.
-        if not st.session_state.lock_inputs:
-            st.session_state.allUserTypedData["periods"] = {
-                "long": longererPeriodBar,
-                "short": shorterPeriodBar,
-            }
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.button("Previous Step", on_click=prev_step)
-        with col2:
-            st.button("Next Step", on_click=next_step)
-
-        if st.session_state.changed_flag is True:
-            st.button("Confirm Change", on_click=confirm_change)
-            # this button only shows itself when in the last step user comes to this step.
-
-    # -------------------END | SELECTING THE PERIOD OF MOVING AVERAGES--------------------------------------#
-
-    elif st.session_state.step == 6:
+    elif st.session_state.step == 4:
 
         st.header("Confirmation")
 
         st.markdown(
             f"""<b><p style="font-size:22px">
         1. Instrument : {st.session_state.allUserTypedData["symbol"]}</br>
-        2. Price Calculation method : {st.session_state.allUserTypedData["calc_meth"]}</br>
-        3. Strategy : {st.session_state.allUserTypedData['strategy']["tool"]} with {st.session_state.allUserTypedData['strategy']["kind"]}</br>
-        4. Periods : Short = {st.session_state.allUserTypedData["periods"]["short"]}, Long = {st.session_state.allUserTypedData["periods"]["long"]}</br></p></b>""",
+        2. Strategy : {st.session_state.allUserTypedData['strategy']["tool"]} with {st.session_state.allUserTypedData['strategy']["kind"]}</br>
+        </br></p></b>""",
             unsafe_allow_html=True,
         )
 
@@ -315,7 +232,7 @@ def TheBot():
         )
 
         st.markdown(
-            f"""<font color='hotpink'><b><p style="font-size:22px">Do you want to proceed and Run the bot with your information or you want to change things? </p></b></font>""",
+            f"""<font color='hotpink'><b><p style="font-size:22px">Do you want to proceed or you want to change things? </p></b></font>""",
             unsafe_allow_html=True,
         )
 
@@ -338,9 +255,7 @@ def TheBot():
 
             allTheStepsdict = {
                 "Selecting INSTRUMENT": 2,
-                "Selecting how to CALCULATE PRICE": 3,
-                "Selecting STRATEGY and its KIND": 4,
-                "Selecting the PERIODS": 5,
+                "Selecting STRATEGY and its KIND": 3,
             }
 
             st.markdown(
@@ -362,15 +277,50 @@ def TheBot():
 
     if st.session_state.start_trading:
 
-        st.header("Running The Bot", divider="rainbow")
+        st.header("Complete The Bot", divider="rainbow")
 
         # Instantiate The bot to start Trading.
         if st.session_state.allUserTypedData["strategy"]["tool"] == "MA Models":
 
             if "bot_input" not in st.session_state:
                 st.session_state.bot_input = False
-            # For locking the timeFrame/atrMultiplier/RR if user clicked a button.
+            # For locking the timeFrame/atrMultiplier/RR if user clicked a button. + Price Calculation and short/long periods.
 
+            col_price_cal_meth = st.selectbox(
+                "Select Price Calculation Method:",
+                list(
+                    {
+                        "close",
+                        "open",
+                        "high",
+                        "low",
+                        "median",
+                        "typical",
+                        "weighted",
+                    }
+                ),
+                disabled=st.session_state.bot_input,
+            )
+
+            spCol, lpCol = st.columns(2)  # Short Period, LongPeriod
+
+            increase_value_of_slider = st.checkbox(
+                "Check Me if you want to increase max value of Shorter and Longer period to 99999"
+            )
+            with spCol:
+                shorterPeriodBar = st.slider(
+                    "Chose the shorter period For Moving Average",
+                    min_value=1,
+                    max_value=99999 if increase_value_of_slider else 50,
+                    disabled=st.session_state.bot_input,
+                )
+            with lpCol:
+                longererPeriodBar = st.slider(
+                    "Chose the Longer period For Moving Average",
+                    min_value=shorterPeriodBar + 1,
+                    max_value=99999 if increase_value_of_slider else 200,
+                    disabled=st.session_state.bot_input,
+                )
             # Ask User For the DesireTime Frame.
             from MovingAverage import MovingAverage as mv
 
@@ -381,30 +331,43 @@ def TheBot():
                 timeFrames,
                 disabled=st.session_state.bot_input,
             )
+            try:
+                bot_check_box = False
+                col_atr, col_rr = st.columns(2)
 
-            col_atr, col_rr = st.columns(2)
+                with col_atr:
+                    user_atr = st.text_input(
+                        "Enter your ATR multiplier:",
+                        disabled=st.session_state.bot_input,
+                    )
+                    user_atr = float(user_atr)
+                with col_rr:
+                    user_rr = st.text_input(
+                        "Enter your desired R/R :",
+                        disabled=st.session_state.bot_input,
+                    )
+                    user_rr = float(user_rr)
+                    bot_check_box = st.checkbox("Confirm and Start The Bot")
+            except:
+                st.write(":red[PLEASE ENTER FLOATING POINT OR INTEGER NUMBERS]")
 
-            with col_atr:
-                user_atr = st.text_input(
-                    "Enter your ATR multiplier for the stop loss (eg: 1.5atr) :",
-                    disabled=st.session_state.bot_input,
-                )
-            with col_rr:
-                user_rr = st.text_input(
-                    "Enter your R/R (eg: 2 -> 2 * selected ATR for Take profit) :",
-                    disabled=st.session_state.bot_input,
-                )
-
-            if st.checkbox("Confirm and Start The Bot"):
+            if bot_check_box and (
+                longererPeriodBar
+                and shorterPeriodBar
+                and user_time_frame
+                and col_price_cal_meth
+                and user_atr
+                and user_rr
+            ):
                 st.session_state.bot_input = True
 
                 st.session_state.tb.MovingAverage(
                     symbol=st.session_state.allUserTypedData["symbol"],
-                    nLongCandle=st.session_state.allUserTypedData["periods"]["long"],
-                    nShortCandle=st.session_state.allUserTypedData["periods"]["short"],
+                    nLongCandle=longererPeriodBar,
+                    nShortCandle=shorterPeriodBar,
                     timeFrame=user_time_frame,
                     kind=st.session_state.allUserTypedData["strategy"]["kind"],
-                    applyWhere=st.session_state.allUserTypedData["calc_meth"],
+                    applyWhere=col_price_cal_meth,
                     atrMultiplier=user_atr,
                     RR=user_rr,
                 )
@@ -417,3 +380,6 @@ def TheBot():
                 st.header("All Orders That made by this BOT", divider="rainbow")
                 df = st.session_state.tb.AllPlacedOrders()
                 st.dataframe(df)
+
+            else:
+                st.write(":red[PLEASE ENTER VALID VALUES.]")
