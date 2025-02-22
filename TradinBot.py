@@ -308,6 +308,7 @@ class TradingBot:
                 "MA CrossOver",
             ),
         )
+        conn_buy_sell.commit()
         return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     @staticmethod
@@ -348,6 +349,7 @@ class TradingBot:
                 "MA CrossOver",
             ),
         )
+        conn_buy_sell.commit()
         return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     def __repr__(self):
