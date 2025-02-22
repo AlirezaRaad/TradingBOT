@@ -1,5 +1,6 @@
 import streamlit as st
 from WebApp_Home import Home as web_home
+from WebApp_AboutStrategies import AboutStrat
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:
@@ -26,7 +27,7 @@ def Home():
 
 
 def About_Strategies():
-    pass
+    AboutStrat()
 
 
 def Telegram_Connection():
