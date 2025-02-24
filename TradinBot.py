@@ -125,7 +125,7 @@ class TradingBot:
             "median",
             "typical",
             "weighted",
-        ] = "median ",
+        ] = "median",
         atrMultiplier: float = 1.5,
         RR: float = 2.0,
     ):
@@ -194,11 +194,6 @@ class TradingBot:
         shorter_ma.append(shorterMA())
         longer_ma.append(longerMA())
 
-        self.BuyOrder(
-            obj=longerMovingAverage,
-            symbol=symbol,
-        )
-
         while True:
 
             # Calculate new values
@@ -214,30 +209,44 @@ class TradingBot:
                 while True:
                     # If we have an open Position, do now check and go for another one. Prevent to open Two Positions.
                     if len(mt5.positions_get()) != 0:
-                        break
+                        print(shorter_ma)
+                        print(longer_ma)
+                        print(
+                            f"{shorter_ma[0] < longer_ma[0]} and {shorter_ma[1] > longer_ma[1]}"
+                        )
+                        print(
+                            f"{shorter_ma[0] > longer_ma[0]} and {shorter_ma[1] < longer_ma[1]}"
+                        )
 
-                if shorter_ma[0] < longer_ma[0] and shorter_ma[1] > longer_ma[1]:
-                    print("BUY signal detected!")
-                    self.BuyOrder(
-                        obj=longerMovingAverage,
-                        symbol=symbol,
-                        atrMult=atrMultiplier,
-                        RR=RR,
-                    )
-                    print("BUY Order Executed!")
-                    return 1
+                        # break
+                        return 0
 
-                # Check for Death Cross
-                elif shorter_ma[0] > longer_ma[0] and shorter_ma[1] < longer_ma[1]:
-                    print("SELL signal detected!")
-                    self.SellOrder(
-                        obj=longerMovingAverage,
-                        symbol=symbol,
-                        atrMult=atrMultiplier,
-                        RR=RR,
-                    )
-                    print("SELL Order Executed!")
-                    return -1
+                    if (shorter_ma[0] < longer_ma[0]) and (
+                        shorter_ma[1] > longer_ma[1]
+                    ):
+                        print("BUY signal detected!")
+                        self.BuyOrder(
+                            obj=longerMovingAverage,
+                            symbol=symbol,
+                            atrMult=atrMultiplier,
+                            RR=RR,
+                        )
+                        print("BUY Order Executed!")
+                        return 1
+
+                    # Check for Death Cross
+                    elif (shorter_ma[0] > longer_ma[0]) and (
+                        shorter_ma[1] < longer_ma[1]
+                    ):
+                        print("SELL signal detected!")
+                        self.SellOrder(
+                            obj=longerMovingAverage,
+                            symbol=symbol,
+                            atrMult=atrMultiplier,
+                            RR=RR,
+                        )
+                        print("SELL Order Executed!")
+                        return -1
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
@@ -297,7 +306,7 @@ class TradingBot:
                 price,
                 tp,
                 sl,
-                0.01,
+                0.02,
                 "BUY",
                 "MA CrossOver",
             ),

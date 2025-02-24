@@ -361,7 +361,12 @@ def TheBot():
             ):
                 st.session_state.bot_input = True
 
-                st.session_state.tb.MovingAverage(
+                st.markdown(
+                    f"""<b><p style="font-size:25px">Bot is running!!""",
+                    unsafe_allow_html=True,
+                )
+
+                ordr_places_buy_bot = st.session_state.tb.MovingAverage(
                     symbol=st.session_state.allUserTypedData["symbol"],
                     nLongCandle=longererPeriodBar,
                     nShortCandle=shorterPeriodBar,
@@ -372,10 +377,16 @@ def TheBot():
                     RR=user_rr,
                 )
 
-                st.markdown(
-                    f"""<b><p style="font-size:25px">Bot is running!!""",
-                    unsafe_allow_html=True,
-                )
+                if ordr_places_buy_bot == 1:
+                    st.markdown(
+                        f"""<b><p style="font-size:25px">BUY Order Placed!""",
+                        unsafe_allow_html=True,
+                    )
+                elif ordr_places_buy_bot == -1:
+                    st.markdown(
+                        f"""<b><p style="font-size:25px">SELL Order Placed!""",
+                        unsafe_allow_html=True,
+                    )
 
                 st.header("All Orders That made by this BOT", divider="rainbow")
                 df = st.session_state.tb.all_orders
