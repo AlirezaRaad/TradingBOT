@@ -378,7 +378,7 @@ def TheBot():
                 )
 
                 st.header("All Orders That made by this BOT", divider="rainbow")
-                df = st.session_state.tb.AllPlacedOrders()
+                df = st.session_state.tb.all_orders
                 st.dataframe(df)
 
             else:

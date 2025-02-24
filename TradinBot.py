@@ -128,7 +128,6 @@ class TradingBot:
         ] = "median ",
         atrMultiplier: float = 1.5,
         RR: float = 2.0,
-        stop: bool = False,
     ):
         """
         timeFrame : MA Time Frame
@@ -143,7 +142,6 @@ class TradingBot:
         RR -> Risk/Reward ratio. Default Value is 2.0 which means (atrMultiplier * atr) * RR for the profits.
 
         ------------------------
-        stop : This Variable Explicitly Implemented in order to stop the while true loop from an external place.
         """
         from MovingAverage import MovingAverage
 
@@ -201,8 +199,6 @@ class TradingBot:
         )
 
         while True:
-            if stop:
-                break
 
             # Calculate new values
             new_shorter = shorterMA()
