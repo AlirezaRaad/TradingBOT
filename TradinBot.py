@@ -149,6 +149,7 @@ class TradingBot:
             raise TypeError("Please Provide The CORRECT MA METHOD.")
         if symbol not in TradingBot.available_symbols:
             raise TypeError("Please Provide The SYMBOL That your Broker has.")
+
         # Creating Shorter MovingAverage Class with its correct MA method.
         shorterMovingAverage = MovingAverage(
             kind=kind,
@@ -262,8 +263,7 @@ class TradingBot:
 
         return atr
 
-    @staticmethod
-    def BuyOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
+    def BuyOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
         price = mt5.symbol_info_tick(symbol).ask
 
         atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow)
@@ -285,7 +285,7 @@ class TradingBot:
         }
 
         mt5.order_send(request)
-        bs_cursor.execute(
+        self.buysell_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
             (
@@ -299,11 +299,10 @@ class TradingBot:
                 "MA CrossOver",
             ),
         )
-        conn_buy_sell.commit()
+        self.conn_to_buysell.commit()
         return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
-    @staticmethod
-    def SellOrder(obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
+    def SellOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
 
         price = mt5.symbol_info_tick(symbol).bid
 
@@ -326,7 +325,7 @@ class TradingBot:
         }
 
         mt5.order_send(request)
-        bs_cursor.execute(
+        self.buysell_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
             (
@@ -340,7 +339,7 @@ class TradingBot:
                 "MA CrossOver",
             ),
         )
-        conn_buy_sell.commit()
+        self.conn_to_buysell.commit()
         return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     @staticmethod
