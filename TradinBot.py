@@ -7,21 +7,6 @@ from typing import Optional, Literal
 from types import SimpleNamespace
 from collections import deque
 
-conn_buy_sell = sql.connect("BuySellHistory.db")
-bs_cursor = conn_buy_sell.cursor()
-bs_cursor.execute(
-    """CREATE TABLE IF NOT EXISTS orders (
-                  Time nvarchar(26) PRIMARY KEY,
-                  Symbol nvarchar(10),
-                  Price float,
-                  SL float,
-                  TP float,
-                  Volume float,
-                  Type char(4),
-                  Strategy nvarchar(50))
-"""
-)
-
 
 # TODO: DONT FORGET TO ADD SQL DATABASE.
 class TradingBot:
@@ -59,6 +44,8 @@ class TradingBot:
         if not self.connect():
             raise ValueError("Enter Correct Credentials")
         TradingBot.FetchAllAvailableSymbols()
+        self.sql_db_name = f"BuySellHistory_{username}.db"
+        self.SqlDbMaker()
 
     @classmethod
     def FetchAllAvailableSymbols(cls):
@@ -362,6 +349,32 @@ class TradingBot:
         returns a pandas DataFrame of all placed Orders Using This Bot.
         """
         return pd.read_sql("SELECT * FROM orders", conn_buy_sell)
+
+    def SqlDbMaker(self):
+        """
+        Makes a sql database with sqlite and returns True.
+        Returns Value Error with custom message if it Failed.
+        """
+        try:
+            self.conn_to_buysell = sql.connect(
+                self.sql_db_name, check_same_thread=False
+            )
+            self.buysell_cursor = self.conn_to_buysell.cursor()
+            self.buysell_cursor.execute(
+                """CREATE TABLE IF NOT EXISTS orders (
+                            Time nvarchar(26) PRIMARY KEY,
+                            Symbol nvarchar(10),
+                            Price float,
+                            SL float,
+                            TP float,
+                            Volume float,
+                            Type char(4),
+                            Strategy nvarchar(50))
+            """
+            )
+            return True
+        except:
+            return ValueError("Sql database making has faces Errors.")
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"
