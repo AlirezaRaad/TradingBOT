@@ -4,8 +4,6 @@ from TradinBot import TradingBot
 
 
 def TheBot():
-    conn_buy_sell = sql.connect("BuySellHistory.db")
-    bs_cursor = conn_buy_sell.cursor()
 
     st.header("Raad Algoritmic TradingBot", divider="rainbow")
 
@@ -347,9 +345,18 @@ def TheBot():
                         disabled=st.session_state.bot_input,
                     )
                     user_rr = float(user_rr)
-                    bot_check_box = st.checkbox("Confirm and Start The Bot")
             except:
                 st.write(":red[PLEASE ENTER FLOATING POINT OR INTEGER NUMBERS]")
+
+            try:
+                iteration_order = int(
+                    st.text_input(
+                        "Please Enter The Number of trades that you want The bot to make!"
+                    )
+                )
+                bot_check_box = st.checkbox("Confirm and Start The Bot")
+            except:
+                st.markdown("Note: Please Enter an integer Number!!!")
 
             if bot_check_box and (
                 longererPeriodBar
@@ -360,37 +367,38 @@ def TheBot():
                 and user_rr
             ):
                 st.session_state.bot_input = True
+                for num_trade in range(1, iteration_order + 1):
 
-                st.markdown(
-                    f"""<b><p style="font-size:25px">Bot is running!!""",
-                    unsafe_allow_html=True,
-                )
-
-                ordr_places_buy_bot = st.session_state.tb.MovingAverage(
-                    symbol=st.session_state.allUserTypedData["symbol"],
-                    nLongCandle=longererPeriodBar,
-                    nShortCandle=shorterPeriodBar,
-                    timeFrame=user_time_frame,
-                    kind=st.session_state.allUserTypedData["strategy"]["kind"],
-                    applyWhere=col_price_cal_meth,
-                    atrMultiplier=user_atr,
-                    RR=user_rr,
-                )
-
-                if ordr_places_buy_bot == 1:
                     st.markdown(
-                        f"""<b><p style="font-size:25px">BUY Order Placed!""",
-                        unsafe_allow_html=True,
-                    )
-                elif ordr_places_buy_bot == -1:
-                    st.markdown(
-                        f"""<b><p style="font-size:25px">SELL Order Placed!""",
+                        f"""<b><p style="font-size:25px">Bot is running!!""",
                         unsafe_allow_html=True,
                     )
 
-                st.header("All Orders That made by this BOT", divider="rainbow")
-                df = st.session_state.tb.AllPlacedOrders()
-                st.dataframe(df)
+                    ordr_places_buy_bot = st.session_state.tb.MovingAverage(
+                        symbol=st.session_state.allUserTypedData["symbol"],
+                        nLongCandle=longererPeriodBar,
+                        nShortCandle=shorterPeriodBar,
+                        timeFrame=user_time_frame,
+                        kind=st.session_state.allUserTypedData["strategy"]["kind"],
+                        applyWhere=col_price_cal_meth,
+                        atrMultiplier=user_atr,
+                        RR=user_rr,
+                    )
+
+                    if ordr_places_buy_bot == 1:
+                        st.markdown(
+                            f"""<b><p style="font-size:25px">{num_trade} : BUY Order Placed!""",
+                            unsafe_allow_html=True,
+                        )
+                    elif ordr_places_buy_bot == -1:
+                        st.markdown(
+                            f"""<b><p style="font-size:25px">{num_trade} : SELL Order Placed!""",
+                            unsafe_allow_html=True,
+                        )
+
+                    st.header("All Orders That made by this BOT", divider="rainbow")
+                    df = st.session_state.tb.AllPlacedOrders()
+                    st.dataframe(df)
 
             else:
                 st.write(":red[PLEASE ENTER VALID VALUES.]")
