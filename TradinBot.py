@@ -65,11 +65,13 @@ class TradingBot:
         """
         Fetch All symbols that the brokers has and pour the name of them into TradingBot.available_symbols
         """
-        symbols = mt5.symbols_get()
-        for i in range(len(symbols)):
-            cls.available_symbols.add(symbols[i].name)
-
-        return symbols
+        try:
+            symbols = mt5.symbols_get()
+            for i in range(len(symbols)):
+                cls.available_symbols.add(symbols[i].name)
+            return True
+        except:
+            return False
 
     @property
     def username(self):
@@ -158,7 +160,7 @@ class TradingBot:
 
         if kind not in MovingAverage.AllMAs():
             raise TypeError("Please Provide The CORRECT MA METHOD.")
-        if symbol not in TradingBot.FetchAllAvailableSymbols():
+        if symbol not in TradingBot.available_symbols:
             raise TypeError("Please Provide The SYMBOL That your Broker has.")
         # Creating Shorter MovingAverage Class with its correct MA method.
         shorterMovingAverage = MovingAverage(
