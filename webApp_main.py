@@ -2,6 +2,8 @@ import streamlit as st
 from WebApp_Home import Home as web_home
 from WebApp_AboutStrategies import AboutStrat
 from WebApp_BOT import TheBot
+from WebApp_TradeHistory import Tr_hist
+from WebApp_ConnectToAccount import ConnectToMT5
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:
@@ -16,7 +18,14 @@ with st.sidebar:
     # Sidebar for navigation
     page = st.sidebar.radio(
         "Navigation to",
-        ["Home", "About Strategies", "Run The Bot", "Connect To Telegram"],
+        [
+            "Home",
+            "About Strategies",
+            "Connect To MT5",
+            "Connect To Telegram",
+            "Run The Bot",
+            "Trading History",
+        ],
     )
 
     st.header("***Version ?***", help="Current Version : 1.0.0")
@@ -39,6 +48,14 @@ def RunTheBot():
     TheBot()
 
 
+def TradeHistory():
+    Tr_hist()
+
+
+def ConnectMT5():
+    ConnectToMT5()
+
+
 # -------------------END | CREATING SIDEBAR-------------------#
 
 
@@ -51,3 +68,7 @@ elif page == "Run The Bot":
     RunTheBot()
 elif page == "Connect To Telegram":
     Telegram_Connection()
+elif page == "Trading History":
+    TradeHistory()
+elif page == "Connect To MT5":
+    ConnectMT5()
