@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import datetime as dt
 import sqlite3 as sql
+import os
 from typing import Optional, Literal
 from types import SimpleNamespace
 from collections import deque
@@ -44,7 +45,7 @@ class TradingBot:
         if not self.connect():
             raise ValueError("Enter Correct Credentials")
         TradingBot.FetchAllAvailableSymbols()
-        self.sql_db_name = f"BuySellHistory_{username}.db"
+        self.sql_db_name = os.path.join(os.getcwd(), "BuySellHistory", f"{username}.db")
         self.SqlDbMaker()
 
     @classmethod
