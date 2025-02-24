@@ -120,7 +120,7 @@ class MovingAverage:
     def GetData(self):
         df = pd.DataFrame(
             mt5.copy_rates_from_pos(
-                self._sym_bol_, self.alltimeframes()[self.timeframe], 0, self.period + 1
+                self._sym_bol_, self.alltimeframes()[self.timeframe], 0, self.period
             )
         )
 
@@ -132,7 +132,9 @@ class MovingAverage:
         df.drop(columns=["time", "real_volume"], inplace=True)
         df.index.rename("time", inplace=True)
 
-        self.data = df[:-1]
+        # self.data = df[:-1] Removed. Also removed self.period + 1 in mt5.copy_rates_from_pos
+        # i though it would be great to have complete bars but in real time implementation, it missed a whole lot.
+        self.data = df
 
     def Calculate(self):
         """
