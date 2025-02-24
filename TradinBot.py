@@ -129,6 +129,7 @@ class TradingBot:
         ] = "median",
         atrMultiplier: float = 1.5,
         RR: float = 2.0,
+        atrWindow=14,
     ):
         """
         timeFrame : MA Time Frame
@@ -216,6 +217,7 @@ class TradingBot:
                     symbol=symbol,
                     atrMult=atrMultiplier,
                     RR=RR,
+                    atrWindow=atrWindow,
                 )
                 print("BUY Order Executed!")
                 return 1
@@ -228,6 +230,7 @@ class TradingBot:
                     symbol=symbol,
                     atrMult=atrMultiplier,
                     RR=RR,
+                    atrWindow=atrWindow,
                 )
                 print("SELL Order Executed!")
                 return -1

@@ -260,22 +260,33 @@ def TheBot():
             )
             try:
                 bot_check_box = False
-                col_atr, col_rr = st.columns(2)
+                coll_atr_period, col_atr, col_rr = st.columns(3)
+
+                with coll_atr_period:
+                    user_atr_period = st.number_input(
+                        "Enter your ATR period:",
+                        min_value=shorterPeriodBar,
+                        max_value=longererPeriodBar,
+                        disabled=st.session_state.bot_input,
+                    )
 
                 with col_atr:
-                    user_atr = st.text_input(
+                    user_atr = st.number_input(
                         "Enter your ATR multiplier:",
                         disabled=st.session_state.bot_input,
                     )
-                    user_atr = float(user_atr)
                 with col_rr:
-                    user_rr = st.text_input(
+                    user_rr = st.number_input(
                         "Enter your desired R/R :",
                         disabled=st.session_state.bot_input,
                     )
-                    user_rr = float(user_rr)
+                if user_atr_period == 0 or user_rr == 0 or user_atr == 0:
+                    raise ValueError
             except:
-                st.info("PLEASE ENTER FLOATING POINT OR INTEGER NUMBERS")
+                st.info(
+                    "The ATR PERIOD SHOULD NOT BE LESSER THAT MV SHORTER PERIOD AND LARGER THAT MV LONGER PERIOD."
+                )
+                st.info("The ATR Multiplier and R/R Should not be ZERO!")
 
             try:
                 iteration_order = int(
@@ -309,6 +320,7 @@ def TheBot():
                         applyWhere=col_price_cal_meth,
                         atrMultiplier=user_atr,
                         RR=user_rr,
+                        atrWindow=user_atr_period,
                     )
 
                     if ordr_places_buy_bot == 1:
