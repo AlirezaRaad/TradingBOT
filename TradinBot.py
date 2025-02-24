@@ -300,6 +300,7 @@ class TradingBot:
             ),
         )
         self.conn_to_buysell.commit()
+        self.AllPlacedOrders()
         return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
     def SellOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
@@ -340,14 +341,16 @@ class TradingBot:
             ),
         )
         self.conn_to_buysell.commit()
+        self.AllPlacedOrders()
         return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
 
-    @staticmethod
-    def AllPlacedOrders() -> pd.DataFrame:
+    def AllPlacedOrders(self) -> pd.DataFrame:
         """
         returns a pandas DataFrame of all placed Orders Using This Bot.
+        if you Dont provide any variable, it just updates the list.
         """
-        return pd.read_sql("SELECT * FROM orders", conn_buy_sell)
+        self.all_orders = pd.read_sql("SELECT * FROM orders", self.conn_to_buysell)
+        return self.all_orders
 
     def SqlDbMaker(self):
         """
