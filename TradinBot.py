@@ -204,10 +204,12 @@ class TradingBot:
 
             if len(mt5.positions_get()) != 0:
                 break
-
-            # print(f"{shorter_ma} , {longer_ma}", end="\r")
-
-            if (shorter_ma[0] < longer_ma[0]) and (shorter_ma[1] > longer_ma[1]):
+            print(
+                f"Buy : {(shorter_ma[1] > longer_ma[1]) and (shorter_ma[0] < longer_ma[0])} | Sell : {(shorter_ma[1] < longer_ma[1]) and (shorter_ma[0] > longer_ma[0])}",
+                end="\r",
+            )
+            # Check for Golden Cross
+            if (shorter_ma[1] > longer_ma[1]) and (shorter_ma[0] < longer_ma[0]):
                 print("BUY signal detected!")
                 self.BuyOrder(
                     obj=longerMovingAverage,
@@ -219,7 +221,7 @@ class TradingBot:
                 return 1
 
             # Check for Death Cross
-            elif (shorter_ma[0] > longer_ma[0]) and (shorter_ma[1] < longer_ma[1]):
+            elif (shorter_ma[1] < longer_ma[1]) and (shorter_ma[0] > longer_ma[0]):
                 print("SELL signal detected!")
                 self.SellOrder(
                     obj=longerMovingAverage,
