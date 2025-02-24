@@ -204,7 +204,7 @@ def TheBot():
 
     if st.session_state.start_trading:
 
-        st.header("Complete The Bot", divider="rainbow")
+        st.header("Bot", divider="rainbow")
 
         # Instantiate The bot to start Trading.
         if st.session_state.allUserTypedData["strategy"]["tool"] == "MA Models":
@@ -275,7 +275,7 @@ def TheBot():
                     )
                     user_rr = float(user_rr)
             except:
-                st.write(":red[PLEASE ENTER FLOATING POINT OR INTEGER NUMBERS]")
+                st.info("PLEASE ENTER FLOATING POINT OR INTEGER NUMBERS")
 
             try:
                 iteration_order = int(
@@ -285,7 +285,7 @@ def TheBot():
                 )
                 bot_check_box = st.checkbox("Confirm and Start The Bot")
             except:
-                st.markdown("Note: Please Enter an integer Number!!!")
+                st.info("Please Enter an integer Number")
 
             if bot_check_box and (
                 longererPeriodBar
@@ -296,12 +296,9 @@ def TheBot():
                 and user_rr
             ):
                 st.session_state.bot_input = True
-                for num_trade in range(1, iteration_order + 1):
+                st.success("Bot is running")
 
-                    st.markdown(
-                        f"""<b><p style="font-size:25px">Bot is running!!""",
-                        unsafe_allow_html=True,
-                    )
+                for num_trade in range(1, iteration_order + 1):
 
                     ordr_places_buy_bot = st.session_state.tb.MovingAverage(
                         symbol=st.session_state.allUserTypedData["symbol"],
@@ -315,19 +312,10 @@ def TheBot():
                     )
 
                     if ordr_places_buy_bot == 1:
-                        st.markdown(
-                            f"""<b><p style="font-size:25px">{num_trade} : BUY Order Placed!""",
-                            unsafe_allow_html=True,
-                        )
-                    elif ordr_places_buy_bot == -1:
-                        st.markdown(
-                            f"""<b><p style="font-size:25px">{num_trade} : SELL Order Placed!""",
-                            unsafe_allow_html=True,
-                        )
+                        st.success(f"✅ {num_trade} : BUY Order Placed!")
 
-                    st.header("All Orders That made by this BOT", divider="rainbow")
-                    df = st.session_state.tb.AllPlacedOrders()
-                    st.dataframe(df)
+                    elif ordr_places_buy_bot == -1:
+                        st.success(f"✅ {num_trade} : SELL Order Placed!")
 
             else:
-                st.write(":red[PLEASE ENTER VALID VALUES.]")
+                st.error("PLEASE ENTER VALID VALUES THEN CHECK THE BOX")
