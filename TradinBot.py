@@ -142,6 +142,7 @@ class TradingBot:
         RR -> Risk/Reward ratio. Default Value is 2.0 which means (atrMultiplier * atr) * RR for the profits.
 
         ------------------------
+        return 1 if BUY order executed and returns -1 When Sell Order executed.
         """
         from MovingAverage import MovingAverage
 
@@ -224,6 +225,7 @@ class TradingBot:
                         RR=RR,
                     )
                     print("BUY Order Executed!")
+                    return 1
 
                 # Check for Death Cross
                 elif shorter_ma[0] > longer_ma[0] and shorter_ma[1] < longer_ma[1]:
@@ -235,6 +237,7 @@ class TradingBot:
                         RR=RR,
                     )
                     print("SELL Order Executed!")
+                    return -1
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
