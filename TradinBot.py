@@ -196,57 +196,38 @@ class TradingBot:
 
         while True:
 
-            # Calculate new values
-            new_shorter = shorterMA()
-            new_longer = longerMA()
+            shorter_ma.append(shorterMA())
+            longer_ma.append(longerMA())
 
-            shorter_ma.append(new_shorter)
-            longer_ma.append(new_longer)
+            # If we have an open Position, do now check and go for another one. Prevent to open Two Positions.
 
-            # Check for Golden Cross
-            if len(shorter_ma) == 2:
+            if len(mt5.positions_get()) != 0:
+                break
 
-                while True:
-                    # If we have an open Position, do now check and go for another one. Prevent to open Two Positions.
-                    if len(mt5.positions_get()) != 0:
-                        print(shorter_ma)
-                        print(longer_ma)
-                        print(
-                            f"{shorter_ma[0] < longer_ma[0]} and {shorter_ma[1] > longer_ma[1]}"
-                        )
-                        print(
-                            f"{shorter_ma[0] > longer_ma[0]} and {shorter_ma[1] < longer_ma[1]}"
-                        )
+            # print(f"{shorter_ma} , {longer_ma}", end="\r")
 
-                        # break
-                        return 0
+            if (shorter_ma[0] < longer_ma[0]) and (shorter_ma[1] > longer_ma[1]):
+                print("BUY signal detected!")
+                self.BuyOrder(
+                    obj=longerMovingAverage,
+                    symbol=symbol,
+                    atrMult=atrMultiplier,
+                    RR=RR,
+                )
+                print("BUY Order Executed!")
+                return 1
 
-                    if (shorter_ma[0] < longer_ma[0]) and (
-                        shorter_ma[1] > longer_ma[1]
-                    ):
-                        print("BUY signal detected!")
-                        self.BuyOrder(
-                            obj=longerMovingAverage,
-                            symbol=symbol,
-                            atrMult=atrMultiplier,
-                            RR=RR,
-                        )
-                        print("BUY Order Executed!")
-                        return 1
-
-                    # Check for Death Cross
-                    elif (shorter_ma[0] > longer_ma[0]) and (
-                        shorter_ma[1] < longer_ma[1]
-                    ):
-                        print("SELL signal detected!")
-                        self.SellOrder(
-                            obj=longerMovingAverage,
-                            symbol=symbol,
-                            atrMult=atrMultiplier,
-                            RR=RR,
-                        )
-                        print("SELL Order Executed!")
-                        return -1
+            # Check for Death Cross
+            elif (shorter_ma[0] > longer_ma[0]) and (shorter_ma[1] < longer_ma[1]):
+                print("SELL signal detected!")
+                self.SellOrder(
+                    obj=longerMovingAverage,
+                    symbol=symbol,
+                    atrMult=atrMultiplier,
+                    RR=RR,
+                )
+                print("SELL Order Executed!")
+                return -1
 
     def SelectStrategy(self, strategy: Literal["MA", "RSI"]):
         """
@@ -296,7 +277,7 @@ class TradingBot:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        mt5.order_send(request)
+        ordr = mt5.order_send(request)
         self.buysell_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
@@ -313,7 +294,8 @@ class TradingBot:
         )
         self.conn_to_buysell.commit()
         self.AllPlacedOrders()
-        return f"BUY Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
+
+        return ordr.comment
 
     def SellOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
 
@@ -337,7 +319,7 @@ class TradingBot:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        mt5.order_send(request)
+        ordr = mt5.order_send(request)
         self.buysell_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
@@ -354,7 +336,7 @@ class TradingBot:
         )
         self.conn_to_buysell.commit()
         self.AllPlacedOrders()
-        return f"Sell Order Set:\n\tSymbol : {symbol}\n\tPrice : {price} | TP : {tp} | SL : {sl} | Vol : {0.01}\n\tTime of execution {str(dt.datetime.now())} | Strategy : MA CrossOver"
+        return ordr.comment
 
     def AllPlacedOrders(self) -> pd.DataFrame:
         """
