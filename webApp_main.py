@@ -52,7 +52,10 @@ def RunTheBot():
 
 
 def TradeHistory():
-    Tr_hist()
+    try:
+        Tr_hist()
+    except AttributeError:
+        st.error("First Connect To Your MT5 Account!")
 
 
 def ConnectMT5():
