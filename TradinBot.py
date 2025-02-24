@@ -298,7 +298,7 @@ class TradingBot:
         }
 
         mt5.order_send(request)
-        bs_cursor(
+        bs_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
             (
@@ -339,7 +339,7 @@ class TradingBot:
         }
 
         mt5.order_send(request)
-        bs_cursor(
+        bs_cursor.execute(
             f"""INSERT INTO orders (Time ,Symbol ,Price ,SL ,TP ,Volume, Type, Strategy)
                   VALUES (?,?,?,?,?,?,?,?)""",
             (
