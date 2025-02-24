@@ -130,6 +130,7 @@ class TradingBot:
         atrMultiplier: float = 1.5,
         RR: float = 2.0,
         atrWindow=14,
+        volume=0.01,
     ):
         """
         timeFrame : MA Time Frame
@@ -218,6 +219,7 @@ class TradingBot:
                     atrMult=atrMultiplier,
                     RR=RR,
                     atrWindow=atrWindow,
+                    volume=volume,
                 )
                 print("BUY Order Executed!")
                 return 1
@@ -231,6 +233,7 @@ class TradingBot:
                     atrMult=atrMultiplier,
                     RR=RR,
                     atrWindow=atrWindow,
+                    volume=volume,
                 )
                 print("SELL Order Executed!")
                 return -1
@@ -262,7 +265,15 @@ class TradingBot:
 
         return atr
 
-    def BuyOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
+    def BuyOrder(
+        self,
+        obj,
+        symbol,
+        atrWindow=14,
+        atrMult: float = 1.5,
+        RR: float = 2,
+        volume=0.01,
+    ):
         price = mt5.symbol_info_tick(symbol).ask
 
         atr = TradingBot.AtrForBuySell(obj=obj, window=atrWindow)
@@ -273,7 +284,7 @@ class TradingBot:
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": symbol,
-            "volume": 0.01,
+            "volume": volume,
             "type": mt5.ORDER_TYPE_BUY,
             "price": price,
             "sl": sl,
@@ -293,7 +304,7 @@ class TradingBot:
                 price,
                 tp,
                 sl,
-                0.02,
+                volume,
                 "BUY",
                 "MA CrossOver",
             ),
@@ -303,7 +314,15 @@ class TradingBot:
 
         return ordr.comment
 
-    def SellOrder(self, obj, symbol, atrWindow=14, atrMult: float = 1.5, RR: float = 2):
+    def SellOrder(
+        self,
+        obj,
+        symbol,
+        atrWindow=14,
+        atrMult: float = 1.5,
+        RR: float = 2,
+        volume=0.01,
+    ):
 
         price = mt5.symbol_info_tick(symbol).bid
 
@@ -315,7 +334,7 @@ class TradingBot:
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": symbol,
-            "volume": 0.01,
+            "volume": volume,
             "type": mt5.ORDER_TYPE_SELL,
             "price": price,
             "sl": sl,
@@ -335,7 +354,7 @@ class TradingBot:
                 price,
                 tp,
                 sl,
-                0.01,
+                volume,
                 "SELL",
                 "MA CrossOver",
             ),

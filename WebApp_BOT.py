@@ -205,6 +205,7 @@ def TheBot():
     if st.session_state.start_trading:
 
         st.header("Bot", divider="rainbow")
+        # TODO: : REMEMBER TO IMPLEMENT GETTING VOLUME FROM USER OUTSIDE OF THE IFS TO NOT CONSTANTLY GET THE COLUMN IN EVERY IF.
 
         # Instantiate The bot to start Trading.
         if st.session_state.allUserTypedData["strategy"]["tool"] == "MA Models":
@@ -290,10 +291,16 @@ def TheBot():
 
             try:
                 iteration_order = int(
-                    st.text_input(
-                        "Please Enter The Number of trades that you want The bot to make!"
+                    st.number_input(
+                        "Please Enter The Number of trades that you want The bot to make!",
+                        disabled=st.session_state.bot_input,
                     )
                 )
+
+                user_trade_volume = st.number_input(
+                    f"Please enter the volume lats that you want to trade in :"
+                )
+
                 bot_check_box = st.checkbox("Confirm and Start The Bot")
             except:
                 st.info("Please Enter an integer Number")
@@ -321,6 +328,7 @@ def TheBot():
                         atrMultiplier=user_atr,
                         RR=user_rr,
                         atrWindow=user_atr_period,
+                        volume=user_trade_volume,
                     )
 
                     if ordr_places_buy_bot == 1:
