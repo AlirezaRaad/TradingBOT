@@ -45,7 +45,10 @@ def Telegram_Connection():
 
 
 def RunTheBot():
-    TheBot()
+    try:
+        TheBot()
+    except AttributeError:
+        st.error("First Connect To Your MT5 Account!")
 
 
 def TradeHistory():

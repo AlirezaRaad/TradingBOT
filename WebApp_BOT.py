@@ -6,7 +6,6 @@ from TradinBot import TradingBot
 def TheBot():
 
     st.header("Raad Algoritmic TradingBot", divider="rainbow")
-
     # Initialize session state for step tracking
     if "step" not in st.session_state:
         st.session_state.step = 1
@@ -41,7 +40,7 @@ def TheBot():
         """
         In step 6 I implement a way to go to the desire step and change the info. This function will return the user back to step 6.
         """
-        st.session_state.update(step=4)
+        st.session_state.update(step=3)
         st.session_state.changed_flag = False
 
     def confirm_and_lock():
@@ -50,77 +49,8 @@ def TheBot():
 
     # Display different content based on the current step
 
-    # -------------------START | LOG IN-----------------------------#
-    if st.session_state.step == 1:
-
-        st.header("Enter Your Credential.")
-        st.markdown(
-            """<b><p style="font-size:22px">
-            Enter you username/password and the server which you are connect with in mt5 app.</br>
-            <font color='orange'>YOU can find your credentials under Tools -> Options -> Server</font>
-            </p></b>
-
-        """,
-            unsafe_allow_html=True,
-        )
-
-        # Create 2 column to get Username/Password and 1 for Server in a separate boc
-        usernameCol, passwordCol = st.columns(
-            spec=2, vertical_alignment="center", gap="large"
-        )
-
-        with usernameCol:
-            user_username = st.text_input(
-                "Enter your username:",
-                key="USER_username",
-                type="default",
-                disabled=st.session_state.lock_inputs,
-            )
-        with passwordCol:
-            user_password = st.text_input(
-                "Enter your password:",
-                key="USER_password",
-                type="password",
-                disabled=st.session_state.lock_inputs,
-            )
-
-        user_server = st.text_input(
-            "Enter your server:",
-            key="USER_server",
-            type="default",
-            disabled=st.session_state.lock_inputs,
-        )
-
-        confirmedCredential = st.checkbox("Confirm and Lock Inputs to see next Step.")
-
-        # If the program was able to login to mt5 using the credentials, it will go to the next step.
-        if confirmedCredential:
-            try:
-                st.session_state.tb = TradingBot(
-                    username=int(user_username),
-                    password=user_password,
-                    server=user_server,
-                )
-                st.session_state.tb.connect()
-
-                st.session_state.allUserTypedData["credentials"] = {
-                    "username": user_username,
-                    "password": user_password,
-                    "server": user_server,
-                }
-
-                st.button("Next", on_click=next_step)
-
-            except:
-                st.markdown(
-                    """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
-                    unsafe_allow_html=True,
-                )
-
-    # -------------------END | LOG IN-----------------------------#
-
     # -------------------START | SELECT INSTRUMENT-----------------------------#
-    elif st.session_state.step == 2:
+    if st.session_state.step == 1:
 
         st.header("SELECT INSTRUMENT")
 
@@ -144,11 +74,10 @@ def TheBot():
         if st.session_state.changed_flag is True:
             st.button("Confirm Change", on_click=confirm_change)
             # this button only shows itself when in the last step user comes to this step.
-
     # -------------------END | SELECT INSTRUMENT-----------------------------#
 
     # -------------------START | SELECT STRATEGY-----------------------------#
-    elif st.session_state.step == 3:
+    elif st.session_state.step == 2:
 
         st.header("SELECT STRATEGY AND ITS KIND")
 
@@ -193,7 +122,7 @@ def TheBot():
             # this button only shows itself when in the last step user comes to this step.
     # -------------------END | SELECT STRATEGY-----------------------------#
 
-    elif st.session_state.step == 4:
+    elif st.session_state.step == 3:
 
         st.header("Confirmation")
 
@@ -252,8 +181,8 @@ def TheBot():
             )
 
             allTheStepsdict = {
-                "Selecting INSTRUMENT": 2,
-                "Selecting STRATEGY and its KIND": 3,
+                "Selecting INSTRUMENT": 1,
+                "Selecting STRATEGY and its KIND": 2,
             }
 
             st.markdown(
