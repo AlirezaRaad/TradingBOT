@@ -294,6 +294,7 @@ def TheBot():
                     st.number_input(
                         "Please Enter The Number of trades that you want The bot to make!",
                         disabled=st.session_state.bot_input,
+                        min_value=1,
                     )
                 )
 
