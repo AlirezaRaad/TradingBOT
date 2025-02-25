@@ -6,15 +6,22 @@ This Bot automatically READ sql database to see if any new order is added or no.
 import telebot
 import os
 import threading
+import sys
 import sqlite3 as sql
 import datetime as dt
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
-from infos import TelAPI
 
 
+if len(sys.argv) != 3:
+    sys.exit(1)
+
+TelAPI = sys.argv[1]
 bot = telebot.TeleBot(TelAPI)
 
-userID = 11008730
+userID = sys.argv[2]
+
+
+# --------------------------------------------------#
 user_sql_database_path = os.path.join(os.getcwd(), "BuySellHistory", f"{userID}.db")
 user_sql_conn = sql.connect(user_sql_database_path, check_same_thread=False)
 user_sql_cursor = user_sql_conn.cursor()
