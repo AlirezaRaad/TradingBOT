@@ -4,8 +4,7 @@ from WebApp_AboutStrategies import AboutStrat
 from WebApp_BOT import TheBot
 from WebApp_TradeHistory import Tr_hist
 from WebApp_ConnectToAccount import ConnectToMT5
-
-# from WebApp_Telegram import Telegram_bot
+from WebApp_Telegram import Telegram_bot
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:
@@ -43,7 +42,7 @@ def About_Strategies():
 
 
 def Telegram_Connection():
-    # Telegram_bot()
+    Telegram_bot()
     pass
 
 

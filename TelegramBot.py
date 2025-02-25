@@ -93,10 +93,12 @@ def send_start(message):
     )
 
 
-def start_telegram_bot():
-    threading.Thread(target=CheckTheDB, daemon=True).start()
+threading.Thread(target=CheckTheDB, daemon=True).start()
+try:
     bot.polling()
+except KeyboardInterrupt:
+    sys.exit(1)
 
 
 if __name__ == "__main__":
-    start_telegram_bot()
+    pass
