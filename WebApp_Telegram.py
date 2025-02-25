@@ -46,7 +46,10 @@ def Telegram_bot():
                     # st.session_state.telegram_bot.run()
                     st.success("Bot started successfully!")
                     st.session_state.lock_telegram_api_input = True
-                except:
+                # except Exception as e:
+                except subprocess.CalledProcessError as e:
+                    st.write("STDERR:", e.stderr)
+
                     st.error("Please Enter Valid TOKEN")
 
         if (

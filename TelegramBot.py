@@ -29,9 +29,14 @@ user_sql_cursor = user_sql_conn.cursor()
 
 # --------------------------------------------------#
 user_sql_cursor.execute("SELECT Time FROM orders ORDER BY Time DESC LIMIT 1")
-last_trade = user_sql_cursor.fetchone()[0]
-# Gets the date of last trade and I tested that it only be executed 1 time.
-last_trade_date = dt.datetime.strptime(last_trade, "%Y-%m-%d %H:%M:%S.%f")
+last_trade = user_sql_cursor.fetchone()
+
+if last_trade is None:
+    last_trade_date = dt.datetime.now()
+
+else:
+    # Gets the date of last trade and I tested that it only be executed 1 time.
+    last_trade_date = dt.datetime.strptime(last_trade[0], "%Y-%m-%d %H:%M:%S.%f")
 
 
 def CheckTheDB():
