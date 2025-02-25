@@ -94,7 +94,7 @@ def send_start(message):
 def send_start(message):
     bot.send_message(
         message.chat.id,
-        f"This Bot will Sends You message when a order has been set., {user_sql_database_path}",
+        f"This Bot will Sends You message when a order has been set.",
     )
 
 
