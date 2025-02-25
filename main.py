@@ -1,3 +1,5 @@
 import os
 
-os.system(r"streamlit run c:\Users\Alireza\Desktop\VENVs\simpleTradingStrat\webApp.py")
+os.system(
+    r"streamlit run c:\Users\Alireza\Desktop\VENVs\simpleTradingStrat\webApp_main.py"
+)
