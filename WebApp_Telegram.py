@@ -2,10 +2,9 @@ import streamlit as st
 import subprocess
 import os
 
-st.header("Telegram Bot Implementation", divider="rainbow")
-
 
 def Telegram_bot():
+    st.header("Telegram Bot Implementation", divider="rainbow")
     if "telegram_bot" not in st.session_state:
         st.session_state.telegram_bot = None
 
