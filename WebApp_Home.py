@@ -30,8 +30,9 @@ def Home():
         1. ARIMA<br>
         2. ARIMAX <br>
         3. ARIMA + ML Hybrid Models <br>
-        4. LSTM + CNN Hybrid Models<br>
-        5. Facebook Prophet + XGBoost Hybrid<br></p>""",
+        4. ARIMA + XGBoost Hybrid <br>
+        5. LSTM + CNN Hybrid Models<br>
+        6. Facebook Prophet + XGBoost Hybrid<br></p>""",
         unsafe_allow_html=True,
     )
 
