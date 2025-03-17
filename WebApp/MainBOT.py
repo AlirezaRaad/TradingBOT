@@ -64,9 +64,7 @@ def TheBot():
         if not st.session_state.lock_inputs:
             st.session_state.allUserTypedData["symbol"] = user_symbol
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.button("Previous Step", on_click=prev_step)
+        col2 = st.columns(2)
         with col2:
             st.button("Next Step", on_click=next_step)
 
@@ -204,7 +202,6 @@ def TheBot():
     if st.session_state.start_trading:
 
         st.header("Bot", divider="rainbow")
-        # TODO: : REMEMBER TO IMPLEMENT GETTING VOLUME FROM USER OUTSIDE OF THE IFS TO NOT CONSTANTLY GET THE COLUMN IN EVERY IF.
 
         # Instantiate The bot to start Trading.
         if st.session_state.allUserTypedData["strategy"]["tool"] == "MA Models":
@@ -274,11 +271,13 @@ def TheBot():
                     user_atr = st.number_input(
                         "Enter your ATR multiplier:",
                         disabled=st.session_state.bot_input,
+                        min_value=0.01,
                     )
                 with col_rr:
                     user_rr = st.number_input(
                         "Enter your desired R/R :",
                         disabled=st.session_state.bot_input,
+                        min_value=1,
                     )
                 if user_atr_period == 0 or user_rr == 0 or user_atr == 0:
                     raise ValueError
@@ -298,7 +297,8 @@ def TheBot():
                 )
 
                 user_trade_volume = st.number_input(
-                    f"Please enter the volume lats that you want to trade in :"
+                    f"Please enter the volume lats that you want to trade in :",
+                    min_value=0.01,
                 )
 
                 bot_check_box = st.checkbox("Confirm and Start The Bot")
