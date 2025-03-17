@@ -5,21 +5,14 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.TradinBot import TradingBot
 
-from dotenv import load_dotenv
-
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.getcwd()), ".env"))
-
-if os.environ["MT5_USERNAME"]:
-    user_username = os.environ.get("MT5_USERNAME")
-if os.environ["MT5_PASSWORD"]:
-    user_password = os.environ.get("MT5_PASSWORD")
-if os.environ["MT5_SERVER"]:
-    user_server = os.environ.get("MT5_SERVER")
-
 
 def ConnectToMT5():
     if "lock_inputs_acc" not in st.session_state:
         st.session_state.lock_inputs_acc = False
+
+    # Makes a Dictionary to store information of user to give to the bot
+    if "allUserTypedData" not in st.session_state:
+        st.session_state.allUserTypedData = {}
 
     st.header("""Connect To Your MT5 Account!""", divider="rainbow")
 
@@ -78,14 +71,10 @@ def ConnectToMT5():
                 "password": user_password,
                 "server": user_server,
             }
+        except Exception as e:
+            print(e)
+            st.error("PLEASE ENTER CORRECT CREDENTIALS.")
 
-            st.markdown(
-                """<font color='aqua'><b><p style="font-size:22px">CONNECTION SUCCESSFUL. NOW YOU CAN USE OTHER FEATURES.</p></b></font>""",
-                unsafe_allow_html=True,
-            )
+        else:
+            st.success("CONNECTION SUCCESSFUL. NOW YOU CAN USE OTHER FEATURES.")
             st.session_state.lock_inputs_acc = True
-        except:
-            st.markdown(
-                """<font color='yellow'><b><p style="font-size:22px">PLEASE ENTER CORRECT CREDENTIALS.</p></b></font>""",
-                unsafe_allow_html=True,
-            )

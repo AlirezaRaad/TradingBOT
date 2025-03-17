@@ -5,15 +5,6 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.TradinBot import TradingBot
 
-if os.environ.get("MT5_USERNAME"):
-    user_username = os.environ.get("MT5_USERNAME")
-
-if os.environ.get("MT5_PASSWORD"):
-    user_password = os.environ.get("MT5_PASSWORD")
-
-if os.environ.get("MT5_SERVER"):
-    user_server = os.environ.get("MT5_SERVER")
-
 
 def TheBot():
 
@@ -29,10 +20,6 @@ def TheBot():
         st.session_state.start_trading = (
             False  # Controls whether to start the bot or no.
         )
-
-    if "allUserTypedData" not in st.session_state:
-        st.session_state.allUserTypedData = {}
-        # Makes a Dictionary to store information of user to give to the bot
 
     if "lock_inputs" not in st.session_state:
         st.session_state.lock_inputs = False
