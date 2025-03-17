@@ -9,4 +9,4 @@ python_directory = os.path.dirname(os.path.abspath(os.environ["PYTHON_VENV_PATH"
 streamlit_path = os.path.join(python_directory, "streamlit.exe")
 
 
-subprocess.run([streamlit_path, "run", "WebApp\main.py"])
+subprocess.run([streamlit_path, "run", os.path.join("WebApp", "main.py")])

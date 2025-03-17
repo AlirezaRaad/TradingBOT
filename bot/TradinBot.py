@@ -9,7 +9,6 @@ from types import SimpleNamespace
 from collections import deque
 
 
-# TODO: DONT FORGET TO ADD SQL DATABASE.
 class TradingBot:
     """
     This Bot Will Trade Based On Given Parameter and Strategies.
@@ -46,6 +45,7 @@ class TradingBot:
             raise ValueError("Enter Correct Credentials")
         TradingBot.FetchAllAvailableSymbols()
         self.sql_db_name = os.path.join(os.getcwd(), "BuySellHistory", f"{username}.db")
+
         self.SqlDbMaker()
 
     @classmethod
@@ -376,11 +376,16 @@ class TradingBot:
         Makes a sql database with sqlite and returns True.
         Returns Value Error with custom message if it Failed.
         """
+        # if the DB directory dont exist make one
+        os.makedirs(os.path.join(os.getcwd(), "BuySellHistory"), exist_ok=True)
+
+        # Connect to the Database
+        self.conn_to_buysell = sql.connect(self.sql_db_name, check_same_thread=False)
+
+        # making a cursor
+        self.buysell_cursor = self.conn_to_buysell.cursor()
+
         try:
-            self.conn_to_buysell = sql.connect(
-                self.sql_db_name, check_same_thread=False
-            )
-            self.buysell_cursor = self.conn_to_buysell.cursor()
             self.buysell_cursor.execute(
                 """CREATE TABLE IF NOT EXISTS orders (
                             Time nvarchar(26) PRIMARY KEY,
@@ -393,9 +398,12 @@ class TradingBot:
                             Strategy nvarchar(50))
             """
             )
+
+            self.conn_to_buysell.commit()
+
             return True
-        except:
-            return ValueError("Sql database making has faces Errors.")
+        except Exception as e:
+            raise Exception(f"Database creation failed: {e}")
 
     def __repr__(self):
         return f"TradingBot(username={self.username}, password={self.password}, server={self.server})"

@@ -43,7 +43,6 @@ def About_Strategies():
 
 def Telegram_Connection():
     Telegram_bot()
-    pass
 
 
 def RunTheBot():
@@ -56,6 +55,7 @@ def RunTheBot():
 def TradeHistory():
     try:
         Tr_hist()
+
     except AttributeError:
         st.error("First Connect To Your MT5 Account!")
 
