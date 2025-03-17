@@ -5,6 +5,17 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.TradinBot import TradingBot
 
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.getcwd()), ".env"))
+
+if os.environ["MT5_USERNAME"]:
+    user_username = os.environ.get("MT5_USERNAME")
+if os.environ["MT5_PASSWORD"]:
+    user_password = os.environ.get("MT5_PASSWORD")
+if os.environ["MT5_SERVER"]:
+    user_server = os.environ.get("MT5_SERVER")
+
 
 def ConnectToMT5():
     if "lock_inputs_acc" not in st.session_state:

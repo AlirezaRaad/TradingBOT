@@ -1,6 +1,12 @@
 import streamlit as st
 import subprocess
 import os
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.getcwd()), ".env"))
+
+if os.environ["TELEGRAM_BOT_API"]:
+    tel_api = os.environ.get("TELEGRAM_BOT_API")
 
 
 def Telegram_bot():
@@ -29,7 +35,8 @@ def Telegram_bot():
                     st.session_state.telegram_bot.kill()
 
                 # Make a new instance of bot and run it
-                venv_python = r"C:\Users\Alireza\Desktop\VENVs\simpleTradingStrat\simpleTS\Scripts\python.exe"
+
+                venv_python = os.environ["PYTHON_VENV_PATH"]
                 try:
                     st.session_state.telegram_bot = subprocess.run(
                         [

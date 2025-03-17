@@ -5,6 +5,15 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from bot.TradinBot import TradingBot
 
+if os.environ.get("MT5_USERNAME"):
+    user_username = os.environ.get("MT5_USERNAME")
+
+if os.environ.get("MT5_PASSWORD"):
+    user_password = os.environ.get("MT5_PASSWORD")
+
+if os.environ.get("MT5_SERVER"):
+    user_server = os.environ.get("MT5_SERVER")
+
 
 def TheBot():
 
