@@ -33,10 +33,11 @@ def Telegram_bot():
             if st.session_state.telegram_bot:
                 st.session_state.telegram_bot = None
             try:
-                st.session_state.telegram_bot = threading.Thread(
+                threading.Thread(
                     target=start_bot, args=(tel_api, user_id), daemon=True
-                )
-                st.session_state.telegram_bot.start()
+                ).start()
+                st.session_state.telegram_bot = True
+                st.session_state.lock_telegram_api_input = True
                 st.success("Bot started successfully!")
                 st.session_state.lock_telegram_api_input = True
 
@@ -45,8 +46,8 @@ def Telegram_bot():
 
                 st.error("Please Enter Valid TOKEN")
 
-    except AttributeError:
-        st.error("First Log in into your MT5 account")
+    # except AttributeError:
+    #     st.error("First Log in into your MT5 account")
 
     except Exception as e:
         st.error("Unexpected ERROR has occurred.")
@@ -55,7 +56,8 @@ def Telegram_bot():
 
 def start_bot(tel_api, user_id):
     venv_python = os.environ["PYTHON_VENV_PATH"]
-    st.session_state.telegram_bot = subprocess.run(
+
+    subprocess.run(
         [
             venv_python,
             os.path.join("bot", "TelegramBot.py"),
@@ -66,4 +68,3 @@ def start_bot(tel_api, user_id):
         text=True,
         check=True,
     )
-    st.session_state.lock_telegram_api_input = True
