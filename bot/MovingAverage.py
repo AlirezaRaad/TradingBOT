@@ -1,4 +1,4 @@
-from TradinBot import TradingBot
+from .TradinBot import TradingBot
 import MetaTrader5 as mt5
 import pandas as pd
 import numpy as np

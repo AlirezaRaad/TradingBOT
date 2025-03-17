@@ -1,10 +1,10 @@
 import streamlit as st
-from WebApp_Home import Home as web_home
-from WebApp_AboutStrategies import AboutStrat
-from WebApp_BOT import TheBot
-from WebApp_TradeHistory import Tr_hist
-from WebApp_ConnectToAccount import ConnectToMT5
-from WebApp_Telegram import Telegram_bot
+from Home import Home as web_home
+from AboutStrategies import AboutStrat
+from MainBOT import TheBot
+from TradeHistory import Tr_hist
+from ConnectToAccount import ConnectToMT5
+from Telegram import Telegram_bot
 
 # -------------------START | CREATING SIDEBAR-------------------#
 with st.sidebar:

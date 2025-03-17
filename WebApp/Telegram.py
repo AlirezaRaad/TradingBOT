@@ -29,12 +29,12 @@ def Telegram_bot():
                     st.session_state.telegram_bot.kill()
 
                 # Make a new instance of bot and run it
-                venv_python = os.path.join(r"simpleTS\Scripts\python.exe")
+                venv_python = r"C:\Users\Alireza\Desktop\VENVs\simpleTradingStrat\simpleTS\Scripts\python.exe"
                 try:
                     st.session_state.telegram_bot = subprocess.run(
                         [
                             venv_python,
-                            "TelegramBot.py",
+                            os.path.join("bot", "TelegramBot.py"),
                             tel_api,
                             str(user_id),
                         ],

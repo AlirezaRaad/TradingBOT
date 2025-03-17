@@ -147,7 +147,7 @@ class TradingBot:
         ------------------------
         return 1 if BUY order executed and returns -1 When Sell Order executed.
         """
-        from MovingAverage import MovingAverage
+        from bot.MovingAverage import MovingAverage
 
         if kind not in MovingAverage.AllMAs():
             raise TypeError("Please Provide The CORRECT MA METHOD.")

@@ -1,6 +1,9 @@
 import streamlit as st
-import MetaTrader5 as mt5
-from TradinBot import TradingBot
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from bot.TradinBot import TradingBot
 
 
 def ConnectToMT5():

@@ -1,6 +1,9 @@
 import streamlit as st
-import sqlite3 as sql
-from ..bot.TradinBot import TradingBot
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from bot.TradinBot import TradingBot
 
 
 def TheBot():
@@ -250,7 +253,7 @@ def TheBot():
                     disabled=st.session_state.bot_input,
                 )
             # Ask User For the DesireTime Frame.
-            from MovingAverage import MovingAverage as mv
+            from bot.MovingAverage import MovingAverage as mv
 
             timeFrames = mv.alltimeframes()
 
