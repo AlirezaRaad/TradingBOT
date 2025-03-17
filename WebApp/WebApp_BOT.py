@@ -1,6 +1,6 @@
 import streamlit as st
 import sqlite3 as sql
-from TradinBot import TradingBot
+from ..bot.TradinBot import TradingBot
 
 
 def TheBot():
