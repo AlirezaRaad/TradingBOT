@@ -3,7 +3,7 @@ import os
 import subprocess
 
 
-VENV_NAME = "TradingBot_Venv"
+VENV_NAME = "vnv"
 
 # If Venv Do not exists, make one.
 if not os.path.exists(VENV_NAME):
