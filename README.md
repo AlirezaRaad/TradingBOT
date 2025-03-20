@@ -46,3 +46,12 @@ streamlit_path run WebApp\\main.py
 ```
 
 ## *Files in the ***WebApp*** Directory*
+
+| File name | Description |
+|:-----------|:-----------:|
+| `Home.py`     | The Home page with brief explanation of the bot and it capabilities.      |
+| `AboutStrategies.py`     | A full description of every strategy available     |
+| `connectToAccount.py`     | make a `bot/TradinBot.TradingBot` instance and it will pass the `username`, `password`, `server` to it     |
+| `MainBOT.py`     | will use the instance that created in  `connectToAccount.py` and will have options to navigate between given strategies and start the bot to trade.     |
+| `Telegram.py`     | Send the `Telegram API`, `Username` to the `bot/TelegramBot.py` to start the telegram bot.      |
+| `TradeHistory.py`     | Use the `bot/TradinBot.TradingBot` instance to show trading history using AllPlacedOrders() class method.     |
