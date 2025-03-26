@@ -59,9 +59,10 @@ streamlit_path run WebApp\\main.py
 
 
 
+
 ## *Files in the ***bot*** Directory*
-`__init__.py` : I Added an empty __init__ file to make python to treat this folder as a package.</br>
-`TelegramBot.py` : This file is responsible to check the user database to see if there is any changes or not and if there is any, send it to the given telegram bot.
-`TradinBot.py` : This file is the main file that this whole project evolved around. This is the file that contains the main `TradingBot` in it. All of the strategies will be in this class.</br>
-`MovingAverage.py` : This file contains `MovingAverage` class which is responsible to calculate the Moving Average based on given parameter.</br>
+1. `__init__.py` : I Added an empty __init__ file to make python to treat this folder as a package.</br>
+2. `TelegramBot.py` : This file is responsible to check the user database to see if there is any changes or not and if there is any, send it to the given telegram bot.</br>
+3. `TradinBot.py` : This file is the main file that this whole project evolved around. This is the file that contains the main `TradingBot` in it. All of the strategies will be in this class.</br>
+4. `MovingAverage.py` : This file contains `MovingAverage` class which is responsible to calculate the Moving Average based on given parameter.</br>
 
